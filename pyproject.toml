@@ -1,0 +1,22 @@
+[project]
+name = "python-lox"
+version = "0.1.0"
+description = "Python implementation of Lox programming language"
+authors = [
+    {name = "ananthvk", email = "-"},
+]
+dependencies = []
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.scripts]
+pylox = "python_lox.__main__:main"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
