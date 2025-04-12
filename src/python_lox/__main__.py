@@ -1,4 +1,5 @@
 import typer
+import sys
 from rich import print
 from .lox import Lox
 from typing_extensions import Annotated
@@ -22,7 +23,9 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
         return lox.run(source)
 
     # Run in REPL mode
-    print(f"[bold]Pylox {lox.version} ({lox.build_date})")
+    print(
+        f"[bold]Pylox[/bold] {lox.version} ({lox.build_date}) [Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}] on {sys.platform}"
+    )
     print(f'Type [bold]"exit"[/bold] to exit the interpeter')
 
     while True:
