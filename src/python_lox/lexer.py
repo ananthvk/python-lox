@@ -203,6 +203,21 @@ class Lexer:
                     # A single line comment was found, skip until the end of line (but do not consume the newline)
                     while self.lookahead() != "\n" and self.current < len(self.source):
                         self.advance()
+                elif self.match("*"):
+                    while not (
+                        self.lookahead() == "*" and self.lookahead2() == "/"
+                    ) and self.current < len(self.source):
+                        if self.lookahead() == "\n":
+                            self.line += 1
+                        self.advance()
+                    
+                    # If we have reached the end of source program without finding the closing comment
+                    if self.current >= len(self.source):
+                        raise LexerException("Unterminated block comment", self.line, self.index, self.current)
+                    
+                    self.advance()
+                    self.advance()
+
                 else:
                     token = self.create_token(TokenType.SLASH)
 

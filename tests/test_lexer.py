@@ -222,6 +222,7 @@ def test_numbers():
     assert isinstance(tokens[3].literal, float) or isinstance(tokens[3].literal, int)
     assert abs(tokens[3].literal - 3.06) < 10e-5
 
+
 def test_identifiers():
     lexer = Lexer("abc")
     tokens = lexer.process()
@@ -229,8 +230,11 @@ def test_identifiers():
     assert tokens[0].token_type == TokenType.IDENTIFIER
     assert tokens[0].literal == "abc"
 
+
 def test_keywords():
-    lexer = Lexer("and or not false true nil if else class fun for while print return super this var")
+    lexer = Lexer(
+        "and or not false true nil if else class fun for while print return super this var"
+    )
     tokens = lexer.process()
     tokens = [i for i in tokens if i.token_type != TokenType.IDENTIFIER]
     assert len(tokens) == 18
@@ -252,3 +256,39 @@ def test_keywords():
     assert tokens[15].token_type == TokenType.THIS
     assert tokens[16].token_type == TokenType.VAR
     assert tokens[17].token_type == TokenType.EOF
+
+
+def test_block_comments():
+    lexer = Lexer(
+        """
+    /**
+     * This is a block comment
+     * This is another line in the comment
+     / there is a slash * / /* * / ** / / + -= 
+    */
+    b = a + c /* Another -+ comment */
+    /*
+    
+    
+    */
+    d = 5"""
+    )
+    tokens = lexer.process()
+    assert len(tokens) == 9
+    assert tokens[0].token_type == TokenType.IDENTIFIER
+    assert tokens[0].line == 7
+    assert tokens[1].token_type == TokenType.EQUAL
+    assert tokens[1].line == 7
+    assert tokens[2].token_type == TokenType.IDENTIFIER
+    assert tokens[2].line == 7
+    assert tokens[3].token_type == TokenType.PLUS
+    assert tokens[3].line == 7
+    assert tokens[4].token_type == TokenType.IDENTIFIER
+    assert tokens[4].line == 7
+    assert tokens[5].token_type == TokenType.IDENTIFIER
+    assert tokens[5].line == 12
+    assert tokens[6].token_type == TokenType.EQUAL
+    assert tokens[6].line == 12
+    assert tokens[7].token_type == TokenType.NUMBER
+    assert tokens[7].line == 12
+    assert tokens[8].token_type == TokenType.EOF
