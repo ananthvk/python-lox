@@ -1,25 +1,6 @@
 from typing import List
 from .token import Token, TokenType
-
-keywords = {
-    "and": TokenType.AND,
-    "or": TokenType.OR,
-    "not": TokenType.NOT,
-    "false": TokenType.FALSE,
-    "nil": TokenType.NIL,
-    "true": TokenType.TRUE,
-    "if": TokenType.IF,
-    "else": TokenType.ELSE,
-    "class": TokenType.CLASS,
-    "fun": TokenType.FUN,
-    "for": TokenType.FOR,
-    "while": TokenType.WHILE,
-    "print": TokenType.PRINT,
-    "return": TokenType.RETURN,
-    "super": TokenType.SUPER,
-    "this": TokenType.THIS,
-    "var": TokenType.VAR,
-}
+from .tokendefs import keywords, token_type_map_double_char, token_type_map_single_char
 
 
 class LexerException(Exception):
@@ -128,6 +109,26 @@ class Lexer:
         token.literal = float(self.source[self.index : self.current])
         return token
 
+    def find_block_comment(self):
+        while not (
+            self.lookahead() == "*" and self.lookahead2() == "/"
+        ) and self.current < len(self.source):
+            if self.lookahead() == "\n":
+                self.line += 1
+            self.advance()
+
+        # If we have reached the end of source program without finding the closing comment
+        if self.current >= len(self.source):
+            raise LexerException(
+                "Unterminated block comment",
+                self.line,
+                self.index,
+                self.current,
+            )
+
+        self.advance()
+        self.advance()
+
     def find_identifier(self):
         while self.lookahead().isalnum() or self.lookahead() == "_":
             self.advance()
@@ -147,51 +148,16 @@ class Lexer:
         Returns the next token, or None if there are no more tokens
         """
         character = self.advance()
-        token: Token | None = None
+
+        for token_str in token_type_map_double_char:
+            if character == token_str[0] and self.match(token_str[1]):
+                return self.create_token(token_type_map_double_char[token_str])
+
+        for token_str in token_type_map_single_char:
+            if character == token_str[0]:
+                return self.create_token(token_type_map_single_char[token_str])
 
         match character:
-            case "(":
-                token = self.create_token(TokenType.LEFT_PAREN)
-            case ")":
-                token = self.create_token(TokenType.RIGHT_PAREN)
-            case "{":
-                token = self.create_token(TokenType.LEFT_BRACE)
-            case "}":
-                token = self.create_token(TokenType.RIGHT_BRACE)
-            case ",":
-                token = self.create_token(TokenType.COMMA)
-            case ".":
-                token = self.create_token(TokenType.DOT)
-            case "-":
-                token = self.create_token(TokenType.MINUS)
-            case "+":
-                token = self.create_token(TokenType.PLUS)
-            case ";":
-                token = self.create_token(TokenType.SEMICOLON)
-            case "*":
-                token = self.create_token(TokenType.STAR)
-
-            case "!":
-                if self.match("="):
-                    token = self.create_token(TokenType.BANG_EQUAL)
-                else:
-                    token = self.create_token(TokenType.BANG)
-            case ">":
-                if self.match("="):
-                    token = self.create_token(TokenType.GREATER_EQUAL)
-                else:
-                    token = self.create_token(TokenType.GREATER)
-            case "<":
-                if self.match("="):
-                    token = self.create_token(TokenType.LESS_EQUAL)
-                else:
-                    token = self.create_token(TokenType.LESS)
-            case "=":
-                if self.match("="):
-                    token = self.create_token(TokenType.EQUAL_EQUAL)
-                else:
-                    token = self.create_token(TokenType.EQUAL)
-
             case " " | "\t" | "\r":
                 pass
 
@@ -204,33 +170,20 @@ class Lexer:
                     while self.lookahead() != "\n" and self.current < len(self.source):
                         self.advance()
                 elif self.match("*"):
-                    while not (
-                        self.lookahead() == "*" and self.lookahead2() == "/"
-                    ) and self.current < len(self.source):
-                        if self.lookahead() == "\n":
-                            self.line += 1
-                        self.advance()
-                    
-                    # If we have reached the end of source program without finding the closing comment
-                    if self.current >= len(self.source):
-                        raise LexerException("Unterminated block comment", self.line, self.index, self.current)
-                    
-                    self.advance()
-                    self.advance()
-
+                    self.find_block_comment()
                 else:
-                    token = self.create_token(TokenType.SLASH)
+                    return self.create_token(TokenType.SLASH)
 
             case '"':
-                token = self.find_string()
+                return self.find_string()
 
             case _:
                 if character.isdigit():
                     # It may be a number
-                    token = self.find_number()
+                    return self.find_number()
                 elif character.isalpha() or character == "_":
                     # It may be an identifier
-                    token = self.find_identifier()
+                    return self.find_identifier()
                 else:
                     raise LexerException(
                         f"Invalid character '{character}'",
@@ -238,7 +191,7 @@ class Lexer:
                         self.index,
                         self.current,
                     )
-        return token
+        return None
 
     def process(self) -> List[Token]:
         tokens: List[Token] = []
