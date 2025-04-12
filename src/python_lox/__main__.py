@@ -1,6 +1,8 @@
 import typer
 import sys
 from rich import print
+
+from .lexer import LexerException
 from .lox import Lox
 from typing_extensions import Annotated
 
@@ -35,7 +37,10 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
             break
         if line == "":
             continue
-        lox.run(line)
+        try:
+            lox.run(line)
+        except LexerException as e:
+            print(f'[red]{type(e).__name__}: {str(e)} at Line {e.line_no}')
 
 
 def run():
