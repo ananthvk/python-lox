@@ -1,6 +1,26 @@
 from typing import List
 from .token import Token, TokenType
 
+keywords = {
+    "and": TokenType.AND,
+    "or": TokenType.OR,
+    "not": TokenType.NOT,
+    "false": TokenType.FALSE,
+    "nil": TokenType.NIL,
+    "true": TokenType.TRUE,
+    "if": TokenType.IF,
+    "else": TokenType.ELSE,
+    "class": TokenType.CLASS,
+    "fun": TokenType.FUN,
+    "for": TokenType.FOR,
+    "while": TokenType.WHILE,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "var": TokenType.VAR,
+}
+
 
 class LexerException(Exception):
     def __init__(self, message: str, line_no: int, index: int, current: int) -> None:
@@ -48,7 +68,7 @@ class Lexer:
         if self.current >= len(self.source):
             return "\0"
         return self.source[self.current]
-    
+
     def lookahead2(self) -> str:
         if (self.current + 1) >= len(self.source):
             return "\0"
@@ -83,21 +103,43 @@ class Lexer:
         # Literal value, without starting and closing quotes
         token.literal = self.source[self.index + 1 : self.current - 1]
         return token
-    
+
     def find_number(self):
         # While the next character is a digit, move forward
         while self.lookahead().isdigit():
             self.advance()
-        
+
         # Check for an optional ., followed by digits
         if self.lookahead() == "." and self.lookahead2().isdigit():
             self.advance()
-        
+
         while self.lookahead().isdigit():
             self.advance()
-        
+
+        if self.lookahead().isalpha() or self.lookahead() == "_":
+            raise LexerException(
+                f"Invalid character in numeric literal '{self.lookahead()}' ",
+                self.line,
+                self.index,
+                self.current,
+            )
+
         token = self.create_token(TokenType.NUMBER)
-        token.literal = float(self.source[self.index: self.current])
+        token.literal = float(self.source[self.index : self.current])
+        return token
+
+    def find_identifier(self):
+        while self.lookahead().isalnum() or self.lookahead() == "_":
+            self.advance()
+
+        token = self.create_token(TokenType.IDENTIFIER)
+        token.literal = self.source[self.index : self.current]
+
+        keyword = keywords.get(token.literal)
+        if keyword is not None:
+            token.token_type = keyword
+            token.literal = None
+
         return token
 
     def find_token(self) -> Token | None:
@@ -168,9 +210,12 @@ class Lexer:
                 token = self.find_string()
 
             case _:
-                # Check if the character is a digit
                 if character.isdigit():
+                    # It may be a number
                     token = self.find_number()
+                elif character.isalpha() or character == "_":
+                    # It may be an identifier
+                    token = self.find_identifier()
                 else:
                     raise LexerException(
                         f"Invalid character '{character}'",

@@ -221,3 +221,34 @@ def test_numbers():
 
     assert isinstance(tokens[3].literal, float) or isinstance(tokens[3].literal, int)
     assert abs(tokens[3].literal - 3.06) < 10e-5
+
+def test_identifiers():
+    lexer = Lexer("abc")
+    tokens = lexer.process()
+    assert len(tokens) == 2
+    assert tokens[0].token_type == TokenType.IDENTIFIER
+    assert tokens[0].literal == "abc"
+
+def test_keywords():
+    lexer = Lexer("and or not false true nil if else class fun for while print return super this var")
+    tokens = lexer.process()
+    tokens = [i for i in tokens if i.token_type != TokenType.IDENTIFIER]
+    assert len(tokens) == 18
+    assert tokens[0].token_type == TokenType.AND
+    assert tokens[1].token_type == TokenType.OR
+    assert tokens[2].token_type == TokenType.NOT
+    assert tokens[3].token_type == TokenType.FALSE
+    assert tokens[4].token_type == TokenType.TRUE
+    assert tokens[5].token_type == TokenType.NIL
+    assert tokens[6].token_type == TokenType.IF
+    assert tokens[7].token_type == TokenType.ELSE
+    assert tokens[8].token_type == TokenType.CLASS
+    assert tokens[9].token_type == TokenType.FUN
+    assert tokens[10].token_type == TokenType.FOR
+    assert tokens[11].token_type == TokenType.WHILE
+    assert tokens[12].token_type == TokenType.PRINT
+    assert tokens[13].token_type == TokenType.RETURN
+    assert tokens[14].token_type == TokenType.SUPER
+    assert tokens[15].token_type == TokenType.THIS
+    assert tokens[16].token_type == TokenType.VAR
+    assert tokens[17].token_type == TokenType.EOF
