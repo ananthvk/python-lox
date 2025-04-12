@@ -48,12 +48,56 @@ class Lexer:
         if self.current >= len(self.source):
             return "\0"
         return self.source[self.current]
+    
+    def lookahead2(self) -> str:
+        if (self.current + 1) >= len(self.source):
+            return "\0"
+        return self.source[self.current + 1]
 
     def create_token(self, token_type: TokenType) -> Token:
         token = Token()
         token.string_repr = self.source[self.index : self.current]
         token.token_type = token_type
         token.line = self.line
+        return token
+
+    def find_string(self):
+        # Note: Strings are multiline by default
+
+        # Find the terminating "
+        while self.lookahead() != '"' and self.current < len(self.source):
+            if self.lookahead() == "\n":
+                self.line += 1
+            self.advance()
+
+        # We have reached end of file
+        if self.current >= len(self.source):
+            raise LexerException(
+                "Unterminated string literal", self.line, self.index, self.current
+            )
+
+        # Consume the closing string literal
+        self.advance()
+
+        token = self.create_token(TokenType.STRING)
+        # Literal value, without starting and closing quotes
+        token.literal = self.source[self.index + 1 : self.current - 1]
+        return token
+    
+    def find_number(self):
+        # While the next character is a digit, move forward
+        while self.lookahead().isdigit():
+            self.advance()
+        
+        # Check for an optional ., followed by digits
+        if self.lookahead() == "." and self.lookahead2().isdigit():
+            self.advance()
+        
+        while self.lookahead().isdigit():
+            self.advance()
+        
+        token = self.create_token(TokenType.NUMBER)
+        token.literal = float(self.source[self.index: self.current])
         return token
 
     def find_token(self) -> Token | None:
@@ -120,13 +164,20 @@ class Lexer:
                 else:
                     token = self.create_token(TokenType.SLASH)
 
+            case '"':
+                token = self.find_string()
+
             case _:
-                raise LexerException(
-                    f"Invalid character '{character}'",
-                    self.line,
-                    self.index,
-                    self.current,
-                )
+                # Check if the character is a digit
+                if character.isdigit():
+                    token = self.find_number()
+                else:
+                    raise LexerException(
+                        f"Invalid character '{character}'",
+                        self.line,
+                        self.index,
+                        self.current,
+                    )
         return token
 
     def process(self) -> List[Token]:

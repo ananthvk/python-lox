@@ -66,7 +66,7 @@ class TokenType(Enum):
 class Token:
     token_type: TokenType = TokenType.UNKNOWN
     line: int = 0
-    literal: int | str | None = None
+    literal: int | float | str | None = None
     string_repr: str = ""
     
     def __repr__(self) -> str:
