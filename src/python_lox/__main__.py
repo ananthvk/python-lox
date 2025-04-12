@@ -33,6 +33,8 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
         line = input()
         if line == "exit":
             break
+        if line == "":
+            continue
         lox.run(line)
 
 
