@@ -8,7 +8,5 @@ class Lox:
         Execute the source program
         """
         lexer = Lexer(source)
-        for token in lexer.process():
-            print(token)
-
+        print(lexer.process())
         return 0

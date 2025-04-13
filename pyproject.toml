@@ -13,6 +13,9 @@ license = {text = "MIT"}
 [project.scripts]
 pylox = "python_lox.__main__:run"
 
+[tool.pdm.scripts]
+gen-ast = "python tools/generate_ast.py"
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
