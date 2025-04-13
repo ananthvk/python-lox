@@ -28,9 +28,10 @@ from ..token import Token
 def base_class_template(module: str):
     return f"""
 class {module.capitalize()}(ABC):
-    def __init__(self):
-        if type(self) is {module.capitalize()}:
-            raise TypeError("{module.capitalize()} is an abstract base class, cannot instantiate it")
+    @abstractmethod
+    def accept(self, visitor: Visitor[T]) -> T:
+        pass
+
 """
 
 
@@ -46,6 +47,7 @@ class {class_name.capitalize()}({module.capitalize()}):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_{class_name}_{module}(self)
+
 """
 
 
@@ -53,11 +55,10 @@ def visitor_template(module: str, classes: List[str]):
     methods: List[str] = []
     for cls in classes:
         methods += [
-            f"    @abstractmethod\n    def visit_{cls}_{module}(self, expr: '{cls.capitalize()}') -> T:\n        pass\n"
+            f'    @abstractmethod\n    def visit_{cls}_{module}(self, expr: "{cls.capitalize()}") -> T:\n        pass\n'
         ]
 
     return f"""
-
 T = TypeVar('T')
 
 
@@ -72,8 +73,8 @@ def main(output_directory: Path):
     for module, v in ast_classes.items():
         with open(output_directory / f"{module}.py", "w") as outfile:
             outfile.write(module_header)
-            outfile.write(base_class_template(module))
             outfile.write(visitor_template(module, list(v.keys())))
+            outfile.write(base_class_template(module))
             for cls, attrs in v.items():
                 outfile.write(class_template(module, cls, attrs))
 
