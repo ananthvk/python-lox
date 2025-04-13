@@ -17,25 +17,52 @@ ast_classes = {
     }
 }
 
-module_header = """from typing import Any
+module_header = """from typing import Any, Generic, TypeVar
 from dataclasses import dataclass
-from abc import ABC
+from abc import ABC, abstractmethod
 from ..token import Token
-
 
 """
 
 
-def class_template(module_name: str, class_name: str, attributes: List[Tuple[str, str]]):
+def base_class_template(module: str):
+    return f"""
+class {module.capitalize()}(ABC):
+    def __init__(self):
+        if type(self) is {module.capitalize()}:
+            raise TypeError("{module.capitalize()} is an abstract base class, cannot instantiate it")
+"""
+
+
+def class_template(module: str, class_name: str, attributes: List[Tuple[str, str]]):
     attribute_strings: List[str] = []
     for attribute in attributes:
-        attribute_strings.append(f'    {attribute[0]}: {attribute[1]}')
-            
+        attribute_strings.append(f"    {attribute[0]}: {attribute[1]}")
+
     return f"""
 @dataclass
-class {class_name.capitalize()}({module_name}):
+class {class_name.capitalize()}({module.capitalize()}):
 {'\n'.join(attribute_strings)}
 
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_{class_name}_{module}(self)
+"""
+
+
+def visitor_template(module: str, classes: List[str]):
+    methods: List[str] = []
+    for cls in classes:
+        methods += [
+            f"    @abstractmethod\n    def visit_{cls}_{module}(self, expr: '{cls.capitalize()}') -> T:\n        pass\n"
+        ]
+
+    return f"""
+
+T = TypeVar('T')
+
+
+class Visitor(ABC, Generic[T]):
+{'\n'.join(methods)}
 """
 
 
@@ -45,9 +72,10 @@ def main(output_directory: Path):
     for module, v in ast_classes.items():
         with open(output_directory / f"{module}.py", "w") as outfile:
             outfile.write(module_header)
-            outfile.write(f'class {module.capitalize()}(ABC):\n    pass\n\n')
+            outfile.write(base_class_template(module))
+            outfile.write(visitor_template(module, list(v.keys())))
             for cls, attrs in v.items():
-                outfile.write(class_template(module.capitalize(), cls, attrs))
+                outfile.write(class_template(module, cls, attrs))
 
 
 if __name__ == "__main__":
