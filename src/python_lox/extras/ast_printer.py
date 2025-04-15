@@ -1,8 +1,5 @@
 from typing import override, List
-from python_lox.ast import expr as Expr
-from python_lox.token import TokenType, Token
-from python_lox.parser import Parser
-from python_lox.lexer import Lexer
+from ..ast import expr as Expr
 
 
 class ASTPrinter(Expr.Visitor[str]):
@@ -20,6 +17,10 @@ class ASTPrinter(Expr.Visitor[str]):
 
     @override
     def visit_literal_expr(self, expr: Expr.Literal) -> str:
+        if expr.value is None:
+            return "nil"
+        if isinstance(expr.value, bool):
+            return str(expr.value).lower()
         return str(expr.value)
 
     @override
@@ -32,15 +33,3 @@ class ASTPrinter(Expr.Visitor[str]):
             result.append(expression.accept(self))
 
         return f"({name} {' '.join(result)})"
-
-
-while True:
-    inp = input(">>> ")
-    if not inp:
-        continue
-    if inp == "exit":
-        break
-    lexer = Lexer(inp)
-    parser = Parser(lexer.process())
-    printer = ASTPrinter()
-    print(printer.print(parser.expression()))
