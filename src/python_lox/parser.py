@@ -160,6 +160,8 @@ class Parser:
         return self.primary()
 
     def primary(self) -> expr.Expr:
+        if self.match([TokenType.IDENTIFIER]):
+            return expr.Literal(value=self.previous().string_repr)
         if self.match([TokenType.FALSE]):
             return expr.Literal(value=False)
 
