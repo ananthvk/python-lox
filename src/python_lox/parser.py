@@ -69,7 +69,7 @@ class Parser:
 
     def expression(self) -> expr.Expr:
         return self.comma()
-    
+
     def comma(self) -> expr.Expr:
         """
         The comma operator has the lowest precedence among all operators, and it evaluates to it's rightmost expression
@@ -81,7 +81,6 @@ class Parser:
             right = self.ternary()
             exp = expr.Binary(left=exp, operator=operator, right=right)
         return exp
-        
 
     def ternary(self) -> expr.Expr:
         """
@@ -176,6 +175,8 @@ class Parser:
                 [TokenType.RIGHT_PAREN], "Could not find closing ')' after expression"
             )
             return expr.Grouping(exp)
+
+        # Add error productions here to handle missing left hand operands
 
         raise ParserException("Invalid syntax", token=self.previous())
 
