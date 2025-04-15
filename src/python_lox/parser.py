@@ -30,6 +30,14 @@ class Parser:
                 return True
         return False
 
+    def consume(self, token_types: List[TokenType], message: str) -> None:
+        """
+        Similar to match, but throws an exception if the token type does not match
+        """
+        if not self.match(token_types):
+            token = self.peek()
+            raise ParserException(message, token)
+
     def check(self, token_type: TokenType) -> bool:
         """
         Args:
@@ -126,10 +134,37 @@ class Parser:
         if self.match([TokenType.LEFT_PAREN]):
             exp = self.expression()
             # If right parenthesis is not found, it's an error
-            if not self.match([TokenType.RIGHT_PAREN]):
-                raise ParserException(
-                    "Could not find closing ')' after expression", token=self.previous()
-                )
+            self.consume(
+                [TokenType.RIGHT_PAREN], "Could not find closing ')' after expression"
+            )
             return expr.Grouping(exp)
 
         raise ParserException("Invalid syntax", token=self.previous())
+
+    def synchronize(self) -> None:
+        """
+        This method is called when a ParserException is thrown, and the parser state needs to be synchronized.
+        This function moves the parser to the next statement
+        """
+        self.advance()
+        while not self.is_at_end():
+            # We check previous because the current token (not yet consumed) is part of another statement
+            if self.previous().token_type == TokenType.SEMICOLON:
+                return
+
+            if self.peek().token_type in [
+                TokenType.CLASS,
+                TokenType.FUN,
+                TokenType.VAR,
+                TokenType.FOR,
+                TokenType.IF,
+                TokenType.WHILE,
+                TokenType.PRINT,
+                TokenType.RETURN,
+            ]:
+                return
+
+            self.advance()
+
+    def parse(self) -> expr.Expr:
+        return self.expression()

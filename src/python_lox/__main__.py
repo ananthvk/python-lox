@@ -3,6 +3,8 @@ import sys
 from rich import print
 
 from .lexer import LexerException
+from .parser import ParserException
+from .token import TokenType
 from .lox import Lox
 from typing_extensions import Annotated
 
@@ -41,6 +43,12 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
             lox.run(line)
         except LexerException as e:
             print(f'[red]{type(e).__name__}: {str(e)} at Line {e.line_no}')
+        except ParserException as e:
+            if e.token.token_type == TokenType.EOF:
+                print(f'[red]{type(e).__name__}: {str(e)} at the end of file')
+            else:
+                print(f'[red]{type(e).__name__}: {str(e)} at Line {e.token.line}')
+            
 
 
 def run():
