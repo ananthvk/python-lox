@@ -19,5 +19,5 @@ $ pdm run gen-ast src/python_lox/ast
 ## Screenshots
 
 Visualization of AST for `5 * 6 / 3 - 2 / 5 * (6 + 8)`
-[!Visualization of AST](images/ast_visual.png)
+![Visualization of AST](images/ast_visual.png)
 
