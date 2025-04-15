@@ -1,6 +1,8 @@
 from typing import override, List
 from python_lox.ast import expr as Expr
 from python_lox.token import TokenType, Token
+from python_lox.parser import Parser
+from python_lox.lexer import Lexer
 
 
 class ASTPrinter(Expr.Visitor[str]):
@@ -32,11 +34,13 @@ class ASTPrinter(Expr.Visitor[str]):
         return f"({name} {' '.join(result)})"
 
 
-expression = Expr.Binary(
-    Expr.Unary(Token(TokenType.MINUS, string_repr="-"), Expr.Literal(123)),
-    Token(TokenType.STAR, string_repr="*"),
-    Expr.Grouping(Expr.Literal(45.67)),
-)
-
-printer = ASTPrinter()
-print(printer.print(expression))
+while True:
+    inp = input(">>> ")
+    if not inp:
+        continue
+    if inp == "exit":
+        break
+    lexer = Lexer(inp)
+    parser = Parser(lexer.process())
+    printer = ASTPrinter()
+    print(printer.print(parser.expression()))
