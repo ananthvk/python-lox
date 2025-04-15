@@ -1,6 +1,7 @@
 from typing import List
 from .token import Token, TokenType
 from .token import keywords, double_char_tokens, single_char_tokens
+from .error_reporter import ErrorReporter
 
 
 class LexerException(Exception):
@@ -13,7 +14,7 @@ class LexerException(Exception):
 
 
 class Lexer:
-    def __init__(self, source: str):
+    def __init__(self, source: str, error_reporter: ErrorReporter | None = None):
         self.source = source
         # Index of the first character of the current token
         self.index = 0
@@ -22,6 +23,8 @@ class Lexer:
         self.current = 0
         # Line number
         self.line = 1
+
+        self.error_reporter = error_reporter
 
     def advance(self) -> str:
         if self.current < len(self.source):
@@ -198,10 +201,15 @@ class Lexer:
 
         while self.current < len(self.source):
             self.index = self.current
-            token = self.find_token()
-            if token is None:
-                continue
-            tokens.append(token)
+            try:
+                token = self.find_token()
+                if token is None:
+                    continue
+                tokens.append(token)
+            except LexerException as e:
+                if self.error_reporter is None:
+                    raise e
+                self.error_reporter.report("error", f"{str(e)} at line {e.line_no}")
 
         # Add an EOF token, so that parsing becomes easier
         tokens.append(Token(token_type=TokenType.EOF))

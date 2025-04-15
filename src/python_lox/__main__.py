@@ -2,10 +2,8 @@ import typer
 import sys
 from rich import print
 
-from .lexer import LexerException
-from .parser import ParserException
-from .token import TokenType
 from .lox import Lox
+from .error_reporter import ErrorReporter
 from typing_extensions import Annotated
 
 app = typer.Typer()
@@ -17,7 +15,9 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
     Run FILE in script mode if FILE is provided. Otherwise run in interactive mode
     """
 
-    lox = Lox()
+    error_reporter = ErrorReporter()
+
+    lox = Lox(error_reporter)
 
     # Run in script mode
     if file:
@@ -39,16 +39,20 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
             break
         if line == "":
             continue
-        try:
-            lox.run(line)
-        except LexerException as e:
-            print(f'[red]{type(e).__name__}: {str(e)} at Line {e.line_no}')
-        except ParserException as e:
-            if e.token.token_type == TokenType.EOF:
-                print(f'[red]{type(e).__name__}: {str(e)} at the end of file')
-            else:
-                print(f'[red]{type(e).__name__}: {str(e)} at Line {e.token.line}')
-            
+        lox.run(line)
+        if error_reporter.is_error:
+            for message in error_reporter.messages:
+                if message[0] == "error":
+                    print(f"[red]Syntax Error: {message[1]}[/red]")
+                elif message[0] == "fatal":
+                    print(f"[bold][red]Syntax Error: {message[1]}[/red][/bold]")
+                else:
+                    print(f"[yellow]Syntax Error: {message[1]}[/yellow]")
+
+            if error_reporter.too_many_errors():
+                print("[yellow] Too many errors. Further errors supressed [/yellow]")
+            error_reporter.is_error = False
+            error_reporter.messages.clear()
 
 
 def run():

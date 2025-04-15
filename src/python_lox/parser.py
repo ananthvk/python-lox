@@ -1,6 +1,7 @@
 from .token import Token, TokenType
 from typing import List
 from .ast import expr
+from .error_reporter import ErrorReporter
 
 
 class ParserException(Exception):
@@ -10,8 +11,11 @@ class ParserException(Exception):
 
 
 class Parser:
-    def __init__(self, tokens: List[Token]) -> None:
+    def __init__(
+        self, tokens: List[Token], error_reporter: ErrorReporter | None = None
+    ) -> None:
         self.tokens = tokens
+        self.error_reporter = error_reporter
 
         # Next token to be processed
         self.current = 0
@@ -205,10 +209,18 @@ class Parser:
 
             self.advance()
 
-    def parse(self) -> expr.Expr:
-        exp = self.expression()
-        if self.current != len(self.tokens) - 1:
-            raise ParserException(
-                "Unexpected tokens at end of expression", self.tokens[self.current]
-            )
-        return exp
+    def parse(self) -> expr.Expr | None:
+        try:
+            exp = self.expression()
+            if self.current != len(self.tokens) - 1:
+                raise ParserException(
+                    "Unexpected tokens at end of expression", self.tokens[self.current]
+                )
+            return exp
+        except ParserException as e:
+            if self.error_reporter is None:
+                raise e
+            self.error_reporter.report("error", f"{str(e)}", token=self.peek())
+            self.synchronize()
+
+        return None
