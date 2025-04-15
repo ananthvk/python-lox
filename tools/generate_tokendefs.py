@@ -44,6 +44,8 @@ tokendefs = {
         ">": "GREATER",
         "<": "LESS",
         "=": "EQUAL",
+        ":": "COLON",
+        "?": "QUESTION_MARK"
     },
     "double_char_tokens": {
         "!=": "BANG_EQUAL",

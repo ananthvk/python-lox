@@ -11,6 +11,11 @@ ast_classes = {
             ("operator", "Token"),
             ("right", "Expr"),
         ],
+        "ternary": [
+            ("condition", "Expr"),
+            ("if_branch", "Expr"),
+            ("else_branch", "Expr"),
+        ],
         "grouping": [("expression", "Expr")],
         "literal": [("value", "Any")],
         "unary": [("operator", "Token"), ("right", "Expr")],

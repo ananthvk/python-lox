@@ -68,19 +68,45 @@ class Parser:
     # Code for recursive descent parser
 
     def expression(self) -> expr.Expr:
+        return self.comma()
+    
+    def comma(self) -> expr.Expr:
         """
         The comma operator has the lowest precedence among all operators, and it evaluates to it's rightmost expression
         It can be of the form comma ("," comma)*
         """
-        exp = self.comma()
+        exp = self.ternary()
         while self.match([TokenType.COMMA]):
             operator = self.previous()
-            right = self.comma()
+            right = self.ternary()
             exp = expr.Binary(left=exp, operator=operator, right=right)
         return exp
+        
 
-    def comma(self) -> expr.Expr:
-        return self.equality()
+    def ternary(self) -> expr.Expr:
+        """
+        https://en.cppreference.com/w/c/language/operator_precedence
+        In precedence chart, ternery operator's precedence > comma, but is less than equality
+        """
+        # A ternary expression is of the form: equality?equality:ternary
+        exp = self.equality()
+
+        # Look for a ?
+        if self.match([TokenType.QUESTION_MARK]):
+            # It is a ternary expression
+            if_branch = self.expression()
+
+            # There should be a mandatory :
+            self.consume(
+                [TokenType.COLON], "Expected : after if branch in ternary expression"
+            )
+
+            # Recursively parse the else branch, since it can contain another ternery (right associative)
+            else_branch = self.ternary()
+            exp = expr.Ternary(
+                condition=exp, if_branch=if_branch, else_branch=else_branch
+            )
+        return exp
 
     def equality(self) -> expr.Expr:
         exp = self.comparison()
@@ -179,4 +205,9 @@ class Parser:
             self.advance()
 
     def parse(self) -> expr.Expr:
-        return self.expression()
+        exp = self.expression()
+        if self.current != len(self.tokens) - 1:
+            raise ParserException(
+                "Unexpected tokens at end of expression", self.tokens[self.current]
+            )
+        return exp

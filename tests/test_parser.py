@@ -76,18 +76,37 @@ def test_associativity_precedence():
     assert astprint("1 * 2 + 3") == "(+ (* 1.0 2.0) 3.0)"
     assert astprint("-3 * 2") == "(* (- 3.0) 2.0)"
 
+
 def test_grouping():
     assert astprint("(1 + 2) * 3") == "(* (group (+ 1.0 2.0)) 3.0)"
     assert astprint("!(false == true)") == "(! (group (== false true)))"
     assert astprint("((3))") == "(group (group 3.0))"
 
+
 def test_multiple_unary():
     assert astprint("!!true") == "(! (! true))"
     assert astprint("---3") == "(- (- (- 3.0)))"
 
+
 def test_multiple():
     assert astprint("3 + 2 + 5 + 4 + 6") == "(+ (+ (+ (+ 3.0 2.0) 5.0) 4.0) 6.0)"
-    assert astprint("3 == 2 == 5 == 4 == 6") == "(== (== (== (== 3.0 2.0) 5.0) 4.0) 6.0)"
+    assert (
+        astprint("3 == 2 == 5 == 4 == 6") == "(== (== (== (== 3.0 2.0) 5.0) 4.0) 6.0)"
+    )
+
 
 def test_comparisons():
     assert astprint("3 - 2 > 5 - 4") == "(> (- 3.0 2.0) (- 5.0 4.0))"
+
+
+def test_ternary_expression():
+    assert astprint("2 > 3 ? 5 : 7") == "(?: (> 2.0 3.0) 5.0 7.0)"
+    assert (
+        astprint("true ? false ? 1 : 2 : true ? 3 : 4")
+        == "(?: true (?: false 1.0 2.0) (?: true 3.0 4.0))"
+    )
+
+    assert (
+        astprint("2 > 3 ? 5 == 2 : 6 - 3")
+        == "(?: (> 2.0 3.0) (== 5.0 2.0) (- 6.0 3.0))"
+    )

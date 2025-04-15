@@ -24,6 +24,10 @@ class ASTPrinter(Expr.Visitor[str]):
         return str(expr.value)
 
     @override
+    def visit_ternary_expr(self, expr: Expr.Ternary) -> str:
+        return self.parenthesize("?:", expr.condition, expr.if_branch, expr.else_branch)
+
+    @override
     def visit_unary_expr(self, expr: Expr.Unary) -> str:
         return self.parenthesize(expr.operator.string_repr, expr.right)
 

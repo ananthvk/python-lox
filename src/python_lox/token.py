@@ -7,6 +7,7 @@ class TokenType(Enum):
     BANG = auto()
     BANG_EQUAL = auto()
     CLASS = auto()
+    COLON = auto()
     COMMA = auto()
     DOT = auto()
     ELSE = auto()
@@ -31,6 +32,7 @@ class TokenType(Enum):
     OR = auto()
     PLUS = auto()
     PRINT = auto()
+    QUESTION_MARK = auto()
     RETURN = auto()
     RIGHT_BRACE = auto()
     RIGHT_PAREN = auto()
@@ -80,6 +82,8 @@ single_char_tokens = {
     ">": TokenType.GREATER,
     "<": TokenType.LESS,
     "=": TokenType.EQUAL,
+    ":": TokenType.COLON,
+    "?": TokenType.QUESTION_MARK,
 }
 
 double_char_tokens = {

@@ -27,3 +27,6 @@ class RPNPrinter(Expr.Visitor[str]):
     def visit_unary_expr(self, expr: Expr.Unary) -> str:
         return f"{expr.operator.string_repr} {expr.right.accept(self)}"
 
+    @override
+    def visit_ternary_expr(self, expr: Expr.Ternary) -> str:
+        return f"{expr.if_branch} {expr.else_branch} :?"

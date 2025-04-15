@@ -4,12 +4,16 @@ from abc import ABC, abstractmethod
 from ..token import Token
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
     @abstractmethod
     def visit_binary_expr(self, expr: "Binary") -> T:
+        pass
+
+    @abstractmethod
+    def visit_ternary_expr(self, expr: "Ternary") -> T:
         pass
 
     @abstractmethod
@@ -42,6 +46,16 @@ class Binary(Expr):
 
 
 @dataclass
+class Ternary(Expr):
+    condition: Expr
+    if_branch: Expr
+    else_branch: Expr
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_ternary_expr(self)
+
+
+@dataclass
 class Grouping(Expr):
     expression: Expr
 
@@ -64,3 +78,4 @@ class Unary(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+
