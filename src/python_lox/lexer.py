@@ -1,6 +1,6 @@
 from typing import List
 from .token import Token, TokenType
-from .tokendefs import keywords, token_type_map_double_char, token_type_map_single_char
+from .token import keywords, double_char_tokens, single_char_tokens
 
 
 class LexerException(Exception):
@@ -149,13 +149,13 @@ class Lexer:
         """
         character = self.advance()
 
-        for token_str in token_type_map_double_char:
+        for token_str in double_char_tokens:
             if character == token_str[0] and self.match(token_str[1]):
-                return self.create_token(token_type_map_double_char[token_str])
+                return self.create_token(double_char_tokens[token_str])
 
-        for token_str in token_type_map_single_char:
+        for token_str in single_char_tokens:
             if character == token_str[0]:
-                return self.create_token(token_type_map_single_char[token_str])
+                return self.create_token(single_char_tokens[token_str])
 
         match character:
             case " " | "\t" | "\r":

@@ -1,66 +1,102 @@
+
 from enum import Enum, auto
 from dataclasses import dataclass
 
-
 class TokenType(Enum):
-    # Separators
-    LEFT_PAREN = auto()
-    RIGHT_PAREN = auto()
-    LEFT_BRACE = auto()
-    RIGHT_BRACE = auto()
-    COMMA = auto()
-    DOT = auto()
-    SEMICOLON = auto()
-
-    # Arithmetic operators
-    MINUS = auto()
-    PLUS = auto()
-    SLASH = auto()
-    STAR = auto()
-
-    # Relational operators
+    AND = auto()
     BANG = auto()
     BANG_EQUAL = auto()
+    CLASS = auto()
+    COMMA = auto()
+    DOT = auto()
+    ELSE = auto()
+    EOF = auto()
     EQUAL = auto()
     EQUAL_EQUAL = auto()
+    FALSE = auto()
+    FOR = auto()
+    FUN = auto()
     GREATER = auto()
     GREATER_EQUAL = auto()
+    IDENTIFIER = auto()
+    IF = auto()
+    LEFT_BRACE = auto()
+    LEFT_PAREN = auto()
     LESS = auto()
     LESS_EQUAL = auto()
-
-    # Literals
-    IDENTIFIER = auto()
-    STRING = auto()
-    NUMBER = auto()
-
-    # Keywords
-    AND = auto()
-    OR = auto()
-    # Extra: Add not keyword
-    NOT = auto()
-
-    FALSE = auto()
-    TRUE = auto()
+    MINUS = auto()
     NIL = auto()
-
-    IF = auto()
-    ELSE = auto()
-
-    CLASS = auto()
-    FUN = auto()
-
-    FOR = auto()
-    WHILE = auto()
-
+    NOT = auto()
+    NUMBER = auto()
+    OR = auto()
+    PLUS = auto()
     PRINT = auto()
     RETURN = auto()
+    RIGHT_BRACE = auto()
+    RIGHT_PAREN = auto()
+    SEMICOLON = auto()
+    SLASH = auto()
+    STAR = auto()
+    STRING = auto()
     SUPER = auto()
     THIS = auto()
-    VAR = auto()
-    EOF = auto()
-
+    TRUE = auto()
     UNKNOWN = auto()
+    VAR = auto()
+    WHILE = auto()
 
+keywords = {
+    "and": TokenType.AND,
+    "or": TokenType.OR,
+    "not": TokenType.NOT,
+    "false": TokenType.FALSE,
+    "nil": TokenType.NIL,
+    "true": TokenType.TRUE,
+    "if": TokenType.IF,
+    "else": TokenType.ELSE,
+    "class": TokenType.CLASS,
+    "fun": TokenType.FUN,
+    "for": TokenType.FOR,
+    "while": TokenType.WHILE,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "var": TokenType.VAR,
+}
+
+single_char_tokens = {
+    "(": TokenType.LEFT_PAREN,
+    ")": TokenType.RIGHT_PAREN,
+    "{": TokenType.LEFT_BRACE,
+    "}": TokenType.RIGHT_BRACE,
+    ",": TokenType.COMMA,
+    ".": TokenType.DOT,
+    "-": TokenType.MINUS,
+    "+": TokenType.PLUS,
+    ";": TokenType.SEMICOLON,
+    "*": TokenType.STAR,
+    "!": TokenType.BANG,
+    ">": TokenType.GREATER,
+    "<": TokenType.LESS,
+    "=": TokenType.EQUAL,
+}
+
+double_char_tokens = {
+    "!=": TokenType.BANG_EQUAL,
+    ">=": TokenType.GREATER_EQUAL,
+    "<=": TokenType.LESS_EQUAL,
+    "==": TokenType.EQUAL_EQUAL,
+}
+
+misc = {
+    "identifier": TokenType.IDENTIFIER,
+    "number": TokenType.NUMBER,
+    "eof": TokenType.EOF,
+    "unknown": TokenType.UNKNOWN,
+    "string": TokenType.STRING,
+    "slash": TokenType.SLASH,
+}
 
 @dataclass
 class Token:
