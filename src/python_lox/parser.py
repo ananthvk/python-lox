@@ -68,6 +68,18 @@ class Parser:
     # Code for recursive descent parser
 
     def expression(self) -> expr.Expr:
+        """
+        The comma operator has the lowest precedence among all operators, and it evaluates to it's rightmost expression
+        It can be of the form comma ("," comma)*
+        """
+        exp = self.comma()
+        while self.match([TokenType.COMMA]):
+            operator = self.previous()
+            right = self.comma()
+            exp = expr.Binary(left=exp, operator=operator, right=right)
+        return exp
+
+    def comma(self) -> expr.Expr:
         return self.equality()
 
     def equality(self) -> expr.Expr:

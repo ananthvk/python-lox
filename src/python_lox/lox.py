@@ -1,4 +1,3 @@
-from .extras import astprint
 from .lexer import Lexer
 from .parser import Parser
 from .extras.ast_printer import ASTPrinter
@@ -17,5 +16,5 @@ class Lox:
         parser = Parser(tokens)
         expr = parser.parse()
         printer = ASTPrinter()
-        printer.print(expr)
+        print(printer.print(expr))
         return 0
