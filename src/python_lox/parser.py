@@ -1,4 +1,5 @@
 from .token import Token, TokenType
+from .ast import stmt
 from typing import List
 from .ast import expr
 from .error_reporter import ErrorReporter
@@ -238,18 +239,42 @@ class Parser:
 
             self.advance()
 
-    def parse(self) -> expr.Expr | None:
-        try:
-            exp = self.expression()
-            if self.current != len(self.tokens) - 1:
-                raise ParserException(
-                    "Unexpected tokens at end of expression", self.tokens[self.current]
-                )
-            return exp
-        except ParserException as e:
-            if self.error_reporter is None:
-                raise e
-            self.error_reporter.report("error", f"{str(e)}", token=e.token)
-            self.synchronize()
+    def print_statement(self) -> stmt.Print:
+        expression = self.expression()
+        statement = stmt.Print(expression)
+        self.consume([TokenType.SEMICOLON], 'Expected ";" at end of print statement')
+        return statement
 
-        return None
+    def expression_statement(self) -> stmt.Expression:
+        expression = self.expression()
+        statement = stmt.Expression(expression)
+        self.consume([TokenType.SEMICOLON], 'Expected ";" at end of statement')
+        return statement
+
+    def statement(self) -> stmt.Stmt:
+        """
+        Parses a statement
+        statement -> print_statement | expression_statement
+        print_statement -> "print" expression ";"
+        expression_statement -> expression ";"
+        """
+        if self.match([TokenType.PRINT]):
+            return self.print_statement()
+        return self.expression_statement()
+
+    def parse(self) -> List[stmt.Stmt] | None:
+        statements: List[stmt.Stmt] = []
+
+        while not self.is_at_end():
+            try:
+                statements.append(self.statement())
+            except ParserException as e:
+                if self.error_reporter is None:
+                    raise e
+                self.error_reporter.report("error", f"{str(e)}", token=e.token)
+                self.synchronize()
+
+        if self.error_reporter and self.error_reporter.is_error:
+            return None
+
+        return statements

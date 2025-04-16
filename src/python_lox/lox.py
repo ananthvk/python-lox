@@ -19,10 +19,8 @@ class Lox:
         lexer = Lexer(source, self.error_reporter)
         tokens = lexer.process()
         parser = Parser(tokens, self.error_reporter)
-        expr = parser.parse()
-        if expr is not None:
-            output = self.interpreter.interpret(expr)
-            if not self.error_reporter.is_error:
-                print(output)
-                
+        statements = parser.parse()
+        if statements is not None:
+            self.interpreter.interpret(statements)
+
         return 0

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..token import Token
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
@@ -78,3 +78,4 @@ class Unary(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+

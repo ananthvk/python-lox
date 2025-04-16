@@ -19,7 +19,8 @@ ast_classes = {
         "grouping": [("expression", "Expr")],
         "literal": [("value", "object")],
         "unary": [("operator", "Token"), ("right", "Expr")],
-    }
+    },
+    "stmt": {"expression": [("expression", "Expr")], "print": [("expression", "Expr")]},
 }
 
 module_header = """from typing import Generic, TypeVar
@@ -60,7 +61,7 @@ def visitor_template(module: str, classes: List[str]):
     methods: List[str] = []
     for cls in classes:
         methods += [
-            f'    @abstractmethod\n    def visit_{cls}_{module}(self, expr: "{cls.capitalize()}") -> T:\n        pass\n'
+            f'    @abstractmethod\n    def visit_{cls}_{module}(self, {module}: "{cls.capitalize()}") -> T:\n        pass\n'
         ]
 
     return f"""

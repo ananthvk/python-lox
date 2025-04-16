@@ -1,7 +1,9 @@
 from .ast import expr as Expr
+from .ast import stmt as Stmt
 from .token import TokenType
 from .error_reporter import ErrorReporter
-from typing import override, TypeGuard
+from typing import TextIO, override, TypeGuard, List
+import sys
 
 """
 NOTES:
@@ -18,11 +20,14 @@ class RuntimeException(Exception):
         self.exp = exp
 
 
-class Interpreter(Expr.Visitor[object]):
+class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
-    def __init__(self, error_reporter: ErrorReporter | None = None) -> None:
+    def __init__(
+        self, error_reporter: ErrorReporter | None = None, stdout: TextIO = sys.stdout
+    ) -> None:
         super().__init__()
         self.error_reporter = error_reporter
+        self.stdout = stdout
 
     @override
     def visit_literal_expr(self, expr: Expr.Literal) -> object:
@@ -103,6 +108,7 @@ class Interpreter(Expr.Visitor[object]):
                     f'Invalid operator "{expr.operator.string_repr}"', expr
                 )
 
+    @override
     def visit_ternary_expr(self, expr: Expr.Ternary) -> object:
         condition = self.evaluate(expr.condition)
         if self.is_truthy(condition):
@@ -161,12 +167,24 @@ class Interpreter(Expr.Visitor[object]):
             return f"{obj}"
         return str(obj)
 
-    def interpret(self, expr: Expr.Expr) -> str:
+    @override
+    def visit_expression_stmt(self, stmt: Stmt.Expression) -> None:
+        self.evaluate(stmt.expression)
+
+    @override
+    def visit_print_stmt(self, stmt: Stmt.Print) -> None:
+        result = self.evaluate(stmt.expression)
+        print(self.stringify(result), file=self.stdout)
+
+    def execute(self, statement: Stmt.Stmt) -> None:
+        statement.accept(self)
+
+    def interpret(self, statements: List[Stmt.Stmt]) -> None:
         try:
-            value = self.evaluate(expr)
-            return self.stringify(value)
+            for statement in statements:
+                self.execute(statement)
+
         except RuntimeException as e:
             if self.error_reporter is None:
                 raise e
             self.error_reporter.report("error", f"{e}")
-        return ""
