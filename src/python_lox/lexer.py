@@ -90,7 +90,106 @@ class Lexer:
         token.literal = self.source[self.index + 1 : self.current - 1]
         return token
 
-    def find_number(self) -> Token:
+    def find_hex_number(self) -> Token:
+        valid_chars = ["a", "b", "c", "d", "e", "f"]
+        while self.lookahead().isdigit() or self.lookahead().lower() in valid_chars:
+            self.advance()
+
+        if (
+            self.lookahead().isalpha()
+            or self.lookahead() == "_"
+            or self.lookahead() == "."
+        ):
+            raise LexerException(
+                f"Invalid character in hexadecimal literal '{self.lookahead()}' ",
+                self.line,
+                self.index,
+                self.current,
+            )
+        lexeme = self.source[self.index : self.current]
+        if lexeme.endswith("x") or lexeme.endswith("X"):
+            raise LexerException(
+                f"Incomplete hexadecimal literal 0x",
+                self.line,
+                self.index,
+                self.current,
+            )
+
+        token = self.create_token(TokenType.NUMBER)
+        token.literal = int(lexeme, base=16)
+        return token
+
+    def find_binary_number(self) -> Token:
+        valid_chars = ["0", "1"]
+        while self.lookahead() in valid_chars:
+            self.advance()
+
+        if (
+            self.lookahead().isalnum()
+            or self.lookahead() == "_"
+            or self.lookahead() == "."
+        ):
+            raise LexerException(
+                f"Invalid character in binary literal '{self.lookahead()}' ",
+                self.line,
+                self.index,
+                self.current,
+            )
+        lexeme = self.source[self.index : self.current]
+        if lexeme.endswith("b") or lexeme.endswith("B"):
+            raise LexerException(
+                f"Incomplete binary literal 0b",
+                self.line,
+                self.index,
+                self.current,
+            )
+
+        token = self.create_token(TokenType.NUMBER)
+        token.literal = int(lexeme, base=2)
+        return token
+
+    def find_octal_number(self) -> Token:
+        valid_chars = ["0", "1", "2", "3", "4", "5", "6", "7"]
+        while self.lookahead() in valid_chars:
+            self.advance()
+
+        if (
+            self.lookahead().isalnum()
+            or self.lookahead() == "_"
+            or self.lookahead() == "."
+        ):
+            raise LexerException(
+                f"Invalid character in octal literal '{self.lookahead()}' ",
+                self.line,
+                self.index,
+                self.current,
+            )
+        lexeme = self.source[self.index : self.current]
+        if lexeme.endswith("o") or lexeme.endswith("O"):
+            raise LexerException(
+                f"Incomplete octal literal 0o",
+                self.line,
+                self.index,
+                self.current,
+            )
+
+        token = self.create_token(TokenType.NUMBER)
+        token.literal = int(lexeme, base=8)
+        return token
+
+    def find_number(self, ch: str) -> Token:
+        """
+        Args:
+            ch: The matched character, i.e. the first character of the numeric string
+        """
+        if ch == "0":
+            if self.match("x") or self.match("X"):
+                return self.find_hex_number()
+            if self.match("b") or self.match("B"):
+                return self.find_binary_number()
+            if self.match("o") or self.match("O"):
+                return self.find_octal_number()
+
         # While the next character is a digit, move forward
         while self.lookahead().isdigit():
             self.advance()
@@ -102,9 +201,33 @@ class Lexer:
         while self.lookahead().isdigit():
             self.advance()
 
-        if self.lookahead().isalpha() or self.lookahead() == "_":
+        # Look for an optional 'e', for exponent part
+        if self.lookahead() == "e" or self.lookahead() == "E":
+            self.advance()
+            # Look for an optional sign (+ / -)
+            if self.lookahead() == "+" or self.lookahead() == "-":
+                self.advance()
+
+            # There should be atleast one digit
+            if not self.lookahead().isdigit():
+                raise LexerException(
+                    "Invalid numeric literal, no number following 'e'",
+                    self.line,
+                    self.index,
+                    self.current,
+                )
+
+            # Consume remaining digits
+            while self.lookahead().isdigit():
+                self.advance()
+
+        if (
+            self.lookahead().isalpha()
+            or self.lookahead() == "_"
+            or self.lookahead() == "."
+        ):
             raise LexerException(
-                f"Invalid character in numeric literal '{self.lookahead()}' ",
+                f"Invalid character in decimal literal '{self.lookahead()}' ",
                 self.line,
                 self.index,
                 self.current,
@@ -189,7 +312,7 @@ class Lexer:
             case _:
                 if character.isdigit():
                     # It may be a number
-                    return self.find_number()
+                    return self.find_number(character)
                 elif character.isalpha() or character == "_":
                     # It may be an identifier
                     return self.find_identifier()
