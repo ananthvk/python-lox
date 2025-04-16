@@ -89,7 +89,7 @@ class ASTExpressionVisualizer(Expr.Visitor[int]):
         self.counter += 1
         this_id = self.counter
 
-        statements.append(f'node{this_id} [label="{expr.operator}"];')
+        statements.append(f'node{this_id} [label="{expr.operator.string_repr}"];')
 
         expr_id = expr.right.accept(self)
 
