@@ -211,7 +211,7 @@ class Parser:
             self.factor()
             raise ParserException("Left hand operand missing", token=err_token)
 
-        raise ParserException("Invalid syntax", token=self.peek())
+        raise ParserException("Invalid syntax", token=self.previous())
 
     def synchronize(self) -> None:
         """
@@ -249,7 +249,7 @@ class Parser:
         except ParserException as e:
             if self.error_reporter is None:
                 raise e
-            self.error_reporter.report("error", f"{str(e)}", token=self.peek())
+            self.error_reporter.report("error", f"{str(e)}", token=e.token)
             self.synchronize()
 
         return None

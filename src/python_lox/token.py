@@ -1,6 +1,6 @@
-
 from enum import Enum, auto
 from dataclasses import dataclass
+
 
 class TokenType(Enum):
     AND = auto()
@@ -46,6 +46,7 @@ class TokenType(Enum):
     UNKNOWN = auto()
     VAR = auto()
     WHILE = auto()
+
 
 keywords = {
     "and": TokenType.AND,
@@ -102,11 +103,17 @@ misc = {
     "slash": TokenType.SLASH,
 }
 
+
 @dataclass
 class Token:
     token_type: TokenType = TokenType.UNKNOWN
     line: int = 0
     literal: int | float | str | None = None
+    
+    # Token spans from [start, end)
+    start: int = 0
+    end: int = 0
+
     string_repr: str = ""
 
     def __repr__(self) -> str:
