@@ -13,6 +13,9 @@ license = {text = "MIT"}
 [project.scripts]
 pylox = "python_lox.__main__:run"
 
+
+[tool.pdm]
+distribution = true
 [tool.pdm.scripts]
 gen-ast = "python tools/generate_ast.py"
 
@@ -21,10 +24,8 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 
-[tool.pdm]
-distribution = true
-
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
+    "mypy>=1.15.0",
 ]
