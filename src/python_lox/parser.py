@@ -184,7 +184,34 @@ class Parser:
 
         # Add error productions here to handle missing left hand operands
 
-        raise ParserException("Invalid syntax", token=self.previous())
+        if self.match([TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL]):
+            err_token = self.previous()
+            self.equality()
+            raise ParserException("Left hand operand missing", token=err_token)
+
+        if self.match(
+            [
+                TokenType.GREATER,
+                TokenType.GREATER_EQUAL,
+                TokenType.LESS,
+                TokenType.LESS_EQUAL,
+            ]
+        ):
+            err_token = self.previous()
+            self.comparison()
+            raise ParserException("Left hand operand missing", token=err_token)
+
+        if self.match([TokenType.PLUS]):
+            err_token = self.previous()
+            self.term()
+            raise ParserException("Left hand operand missing", token=err_token)
+
+        if self.match([TokenType.STAR, TokenType.SLASH]):
+            err_token = self.previous()
+            self.factor()
+            raise ParserException("Left hand operand missing", token=err_token)
+
+        raise ParserException("Invalid syntax", token=self.peek())
 
     def synchronize(self) -> None:
         """

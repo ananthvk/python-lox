@@ -210,6 +210,14 @@ class Lexer:
                 if self.error_reporter is None:
                     raise e
                 self.error_reporter.report("error", f"{str(e)} at line {e.line_no}")
+                while self.current < len(self.source):
+                    if (
+                        self.lookahead() == "\n"
+                        or self.lookahead() == "{"
+                        or self.lookahead() == "}"
+                    ):
+                        break
+                    self.advance()
 
         # Add an EOF token, so that parsing becomes easier
         tokens.append(Token(token_type=TokenType.EOF))
