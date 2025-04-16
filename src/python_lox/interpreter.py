@@ -42,7 +42,9 @@ class Interpreter(Expr.Visitor[object]):
                     return -float(right)
                 raise RuntimeException('Invalid unary operator "-" for type', expr)
             case TokenType.BANG:
-                return self.is_truthy(right)
+                return not self.is_truthy(right)
+            case TokenType.NOT:
+                return not self.is_truthy(right)
             case _:
                 raise AssertionError("Logic error: Invalid unary operator")
         return None
@@ -160,5 +162,4 @@ class Interpreter(Expr.Visitor[object]):
             if self.error_reporter is None:
                 raise e
             self.error_reporter.report("error", f"{e}")
-            pass
         return ""

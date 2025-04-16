@@ -21,5 +21,8 @@ class Lox:
         parser = Parser(tokens, self.error_reporter)
         expr = parser.parse()
         if expr is not None:
-            print(self.interpreter.interpret(expr))
+            output = self.interpreter.interpret(expr)
+            if not self.error_reporter.is_error:
+                print(output)
+                
         return 0
