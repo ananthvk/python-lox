@@ -12,7 +12,7 @@ class ErrorReporter:
         self.is_error = False
         self.messages: List[Tuple[ErrorLevel, str, Token | None]] = []
 
-    def report(self, level: ErrorLevel, message: str, token: Token | None = None):
+    def report(self, level: ErrorLevel, message: str, token: Token | None = None) -> None:
         self.messages.append((level, message, token))
         self.is_error = True
 

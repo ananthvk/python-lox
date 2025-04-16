@@ -67,7 +67,7 @@ class Lexer:
         token.end = self.current
         return token
 
-    def find_string(self):
+    def find_string(self) -> Token:
         # Note: Strings are multiline by default
 
         # Find the terminating "
@@ -90,7 +90,7 @@ class Lexer:
         token.literal = self.source[self.index + 1 : self.current - 1]
         return token
 
-    def find_number(self):
+    def find_number(self) -> Token:
         # While the next character is a digit, move forward
         while self.lookahead().isdigit():
             self.advance()
@@ -114,7 +114,7 @@ class Lexer:
         token.literal = float(self.source[self.index : self.current])
         return token
 
-    def find_block_comment(self):
+    def find_block_comment(self) -> None:
         while not (
             self.lookahead() == "*" and self.lookahead2() == "/"
         ) and self.current < len(self.source):
@@ -134,7 +134,7 @@ class Lexer:
         self.advance()
         self.advance()
 
-    def find_identifier(self):
+    def find_identifier(self) -> Token:
         while self.lookahead().isalnum() or self.lookahead() == "_":
             self.advance()
 

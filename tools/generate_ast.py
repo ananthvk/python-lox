@@ -17,12 +17,12 @@ ast_classes = {
             ("else_branch", "Expr"),
         ],
         "grouping": [("expression", "Expr")],
-        "literal": [("value", "Any")],
+        "literal": [("value", "object")],
         "unary": [("operator", "Token"), ("right", "Expr")],
     }
 }
 
-module_header = """from typing import Any, Generic, TypeVar
+module_header = """from typing import Generic, TypeVar
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from ..token import Token

@@ -132,7 +132,8 @@ class Interpreter(Expr.Visitor[object]):
     def evaluate(self, expr: Expr.Expr) -> object:
         return expr.accept(self)
 
-    def is_same_type(self, obj1: object, obj2: object):
+
+    def is_same_type(self, obj1: object, obj2: object) -> bool:
         return type(obj1) == type(obj2)
 
     def is_numeric(self, obj: object) -> TypeGuard[float]:

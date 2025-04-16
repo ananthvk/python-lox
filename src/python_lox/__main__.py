@@ -10,7 +10,7 @@ app = typer.Typer()
 
 
 @app.command("")
-def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
+def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> int:
     """
     Run FILE in script mode if FILE is provided. Otherwise run in interactive mode
     """
@@ -65,9 +65,10 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = ""):
                 print("[yellow] Too many errors. Further errors supressed [/yellow]")
             error_reporter.is_error = False
             error_reporter.messages.clear()
+    return 0
 
 
-def run():
+def run() -> None:
     app()
 
 

@@ -6,7 +6,7 @@ authors = [
     {name = "ananthvk", email = "-"},
 ]
 dependencies = ["typer>=0.15.2"]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -16,8 +16,11 @@ pylox = "python_lox.__main__:run"
 
 [tool.pdm]
 distribution = true
+
 [tool.pdm.scripts]
 gen-ast = "python tools/generate_ast.py"
+typecheck = "mypy -p python_lox --strict"
+test = "pytest"
 
 [build-system]
 requires = ["pdm-backend"]

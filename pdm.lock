@@ -5,10 +5,10 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:c2bc0a9f91c3187a4ccffae57d09766a889de01ed078661834e35befc1b30fb8"
+content_hash = "sha256:887dc99086c7643c8591412f727080cc11f117fcac601f2077af2e1ea57a5c2c"
 
 [[metadata.targets]]
-requires_python = ">=3.9"
+requires_python = ">=3.10"
 
 [[package]]
 name = "click"
