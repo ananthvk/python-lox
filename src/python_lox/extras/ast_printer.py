@@ -21,9 +21,8 @@ class ASTPrinter(Expr.Visitor[str]):
             return "nil"
         if isinstance(expr.value, bool):
             return str(expr.value).lower()
-        if isinstance(expr.value, float):
-            if expr.value.is_integer():
-                return f"{int(expr.value)}"
+        if isinstance(expr.value, float) or isinstance(expr.value, int):
+            return f"{expr.value}"
         return str(expr.value)
 
     @override

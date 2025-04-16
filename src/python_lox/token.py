@@ -109,7 +109,7 @@ class Token:
     token_type: TokenType = TokenType.UNKNOWN
     line: int = 0
     literal: int | float | str | None = None
-    
+
     # Token spans from [start, end)
     start: int = 0
     end: int = 0
@@ -122,11 +122,7 @@ class Token:
         elif self.token_type == TokenType.STRING:
             return f'<{self.token_type} "{self.literal}">'
         elif self.token_type == TokenType.NUMBER:
-            if (
-                isinstance(self.literal, float) or isinstance(self.literal, int)
-            ) and self.literal.is_integer():
-                return f"<{self.token_type} {int(self.literal)}>"
-            else:
+            if isinstance(self.literal, float) or isinstance(self.literal, int):
                 return f"<{self.token_type} {self.literal}>"
 
         return f"<{self.token_type}>"

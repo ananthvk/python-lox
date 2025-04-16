@@ -39,7 +39,7 @@ class Interpreter(Expr.Visitor[object]):
         match expr.operator.token_type:
             case TokenType.MINUS:
                 if self.is_numeric(right):
-                    return -float(right)
+                    return -right
                 raise RuntimeException('Invalid unary operator "-" for type', expr)
             case TokenType.BANG:
                 return not self.is_truthy(right)
@@ -139,9 +139,12 @@ class Interpreter(Expr.Visitor[object]):
         return expr.accept(self)
 
     def is_same_type(self, obj1: object, obj2: object) -> bool:
+        # Treat int and float as numeric, just the internal representation is different
+        if self.is_numeric(obj1) and self.is_numeric(obj2):
+            return True
         return type(obj1) == type(obj2)
 
-    def is_numeric(self, obj: object) -> TypeGuard[float]:
+    def is_numeric(self, obj: object) -> TypeGuard[float | int]:
         return isinstance(obj, int) or isinstance(obj, float)
 
     def is_string(self, obj: object) -> TypeGuard[str]:
@@ -155,8 +158,6 @@ class Interpreter(Expr.Visitor[object]):
                 return "true"
             return "false"
         if self.is_numeric(obj):
-            if obj.is_integer():
-                return f"{int(obj)}"
             return f"{obj}"
         return str(obj)
 

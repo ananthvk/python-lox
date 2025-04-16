@@ -45,7 +45,7 @@ tokendefs = {
         "<": "LESS",
         "=": "EQUAL",
         ":": "COLON",
-        "?": "QUESTION_MARK"
+        "?": "QUESTION_MARK",
     },
     "double_char_tokens": {
         "!=": "BANG_EQUAL",
@@ -59,8 +59,8 @@ tokendefs = {
         "eof": "EOF",
         "unknown": "UNKNOWN",
         "string": "STRING",
-        "slash": "SLASH"
-    }
+        "slash": "SLASH",
+    },
 }
 
 
@@ -91,9 +91,7 @@ class Token:
         elif self.token_type == TokenType.NUMBER:
             if (
                 isinstance(self.literal, float) or isinstance(self.literal, int)
-            ) and self.literal.is_integer():
-                return f"<{self.token_type} {int(self.literal)}>"
-            else:
+            ):
                 return f"<{self.token_type} {self.literal}>"
 
         return f"<{self.token_type}>"
@@ -118,7 +116,7 @@ def main(output_directory: Path):
 
     with open(output_directory / TOKEN_FILE_NAME, "w") as outfile:
         outfile.write(generate_token_types_class(token_types))
-        outfile.write(''.join(definitions))
+        outfile.write("".join(definitions))
         outfile.write(token_class)
 
 

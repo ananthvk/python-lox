@@ -111,7 +111,11 @@ class Lexer:
             )
 
         token = self.create_token(TokenType.NUMBER)
-        token.literal = float(self.source[self.index : self.current])
+        literal = self.source[self.index : self.current]
+        try:
+            token.literal = int(literal)
+        except:
+            token.literal = float(literal)
         return token
 
     def find_block_comment(self) -> None:
