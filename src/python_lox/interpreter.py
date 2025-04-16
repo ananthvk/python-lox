@@ -104,7 +104,13 @@ class Interpreter(Expr.Visitor[object]):
                 )
 
     def visit_ternary_expr(self, expr: Expr.Ternary) -> object:
-        raise NotImplementedError()
+        condition = self.evaluate(expr.condition)
+        if self.is_truthy(condition):
+            if_branch = self.evaluate(expr.if_branch)
+            return if_branch
+
+        else_branch = self.evaluate(expr.else_branch)
+        return else_branch
 
     def is_truthy(self, obj: object) -> bool:
         if obj is None:
@@ -131,7 +137,6 @@ class Interpreter(Expr.Visitor[object]):
 
     def evaluate(self, expr: Expr.Expr) -> object:
         return expr.accept(self)
-
 
     def is_same_type(self, obj1: object, obj2: object) -> bool:
         return type(obj1) == type(obj2)
