@@ -9,6 +9,32 @@ from typing_extensions import Annotated
 app = typer.Typer()
 
 
+def report_error(error_reporter: ErrorReporter, source: str) -> None:
+    if error_reporter.is_error:
+        for message in error_reporter.messages:
+            token = message[2]
+            extra_info: str = ""
+            if token is None:
+                extra_info = ""
+            else:
+                token_line, start, _ = error_reporter.get_token_line(source, token)
+                if token_line:
+                    squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
+                    extra_info = f'at "{token.string_repr}"\n    {token.line} | {token_line}\n{squiggles}'
+
+            if message[0] == "error":
+                print(f"[red]{message[1]} {extra_info}[/red]")
+            elif message[0] == "fatal":
+                print(
+                    f"[bold][red]{message[1]} {extra_info}[/red][/bold]"
+                )
+            else:
+                print(f"[yellow]{message[1]} {extra_info}[/yellow]")
+
+        if error_reporter.too_many_errors():
+            print("[yellow] Too many errors. Further errors supressed [/yellow]")
+
+
 @app.command("")
 def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> int:
     """
@@ -24,7 +50,11 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
         source = ""
         with open(file, "r") as f:
             source = f.read()
-        return lox.run(source)
+        exit_code = lox.run(source)
+        report_error(error_reporter, source)
+        if error_reporter.is_error:
+            return 1
+        return exit_code
 
     # Run in REPL mode
     print(
@@ -40,31 +70,9 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
         if line == "":
             continue
         lox.run(line)
-        if error_reporter.is_error:
-            for message in error_reporter.messages:
-                token = message[2]
-                extra_info: str = ""
-                if token is None:
-                    extra_info = ""
-                else:
-                    token_line, start, _ = error_reporter.get_token_line(line, token)
-                    if token_line:
-                        squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
-                        extra_info = f'at "{token.string_repr}"\n    {token.line} | {token_line}\n{squiggles}'
-
-                if message[0] == "error":
-                    print(f"[red]Syntax Error: {message[1]} {extra_info}[/red]")
-                elif message[0] == "fatal":
-                    print(
-                        f"[bold][red]Syntax Error: {message[1]} {extra_info}[/red][/bold]"
-                    )
-                else:
-                    print(f"[yellow]Syntax Error: {message[1]} {extra_info}[/yellow]")
-
-            if error_reporter.too_many_errors():
-                print("[yellow] Too many errors. Further errors supressed [/yellow]")
-            error_reporter.is_error = False
-            error_reporter.messages.clear()
+        report_error(error_reporter, line)
+        error_reporter.is_error = False
+        error_reporter.messages.clear()
     return 0
 
 

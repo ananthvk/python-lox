@@ -79,7 +79,7 @@ class Lexer:
         # We have reached end of file
         if self.current >= len(self.source):
             raise LexerException(
-                "Unterminated string literal", self.line, self.index, self.current
+                "Syntax Error: Unterminated string literal", self.line, self.index, self.current
             )
 
         # Consume the closing string literal
@@ -101,7 +101,7 @@ class Lexer:
             or self.lookahead() == "."
         ):
             raise LexerException(
-                f"Invalid character in hexadecimal literal '{self.lookahead()}' ",
+                f"Syntax Error: Invalid character in hexadecimal literal '{self.lookahead()}' ",
                 self.line,
                 self.index,
                 self.current,
@@ -109,7 +109,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("x") or lexeme.endswith("X"):
             raise LexerException(
-                f"Incomplete hexadecimal literal 0x",
+                f"Syntax Error: Incomplete hexadecimal literal 0x",
                 self.line,
                 self.index,
                 self.current,
@@ -130,7 +130,7 @@ class Lexer:
             or self.lookahead() == "."
         ):
             raise LexerException(
-                f"Invalid character in binary literal '{self.lookahead()}' ",
+                f"Syntax Error: Invalid character in binary literal '{self.lookahead()}' ",
                 self.line,
                 self.index,
                 self.current,
@@ -138,7 +138,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("b") or lexeme.endswith("B"):
             raise LexerException(
-                f"Incomplete binary literal 0b",
+                f"Syntax Error: Incomplete binary literal 0b",
                 self.line,
                 self.index,
                 self.current,
@@ -159,7 +159,7 @@ class Lexer:
             or self.lookahead() == "."
         ):
             raise LexerException(
-                f"Invalid character in octal literal '{self.lookahead()}' ",
+                f"Syntax Error: Invalid character in octal literal '{self.lookahead()}' ",
                 self.line,
                 self.index,
                 self.current,
@@ -167,7 +167,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("o") or lexeme.endswith("O"):
             raise LexerException(
-                f"Incomplete octal literal 0o",
+                f"Syntax Error: Incomplete octal literal 0o",
                 self.line,
                 self.index,
                 self.current,
@@ -211,7 +211,7 @@ class Lexer:
             # There should be atleast one digit
             if not self.lookahead().isdigit():
                 raise LexerException(
-                    "Invalid numeric literal, no number following 'e'",
+                    "Syntax Error: Invalid numeric literal, no number following 'e'",
                     self.line,
                     self.index,
                     self.current,
@@ -227,7 +227,7 @@ class Lexer:
             or self.lookahead() == "."
         ):
             raise LexerException(
-                f"Invalid character in decimal literal '{self.lookahead()}' ",
+                f"Syntax Error: Invalid character in decimal literal '{self.lookahead()}' ",
                 self.line,
                 self.index,
                 self.current,
@@ -252,7 +252,7 @@ class Lexer:
         # If we have reached the end of source program without finding the closing comment
         if self.current >= len(self.source):
             raise LexerException(
-                "Unterminated block comment",
+                "Syntax Error: Unterminated block comment",
                 self.line,
                 self.index,
                 self.current,
@@ -318,7 +318,7 @@ class Lexer:
                     return self.find_identifier()
                 else:
                     raise LexerException(
-                        f"Invalid character '{character}'",
+                        f"Syntax Error: Invalid character '{character}'",
                         self.line,
                         self.index,
                         self.current,

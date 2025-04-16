@@ -20,6 +20,7 @@ distribution = true
 [tool.pdm.scripts]
 gen-ast = "python tools/generate_ast.py"
 typecheck = "mypy -p python_lox --strict"
+typecheck-tools = "mypy tools/ast_visualizer.py tools/generate_ast.py tools/generate_tokendefs.py"
 test = "pytest"
 
 [build-system]

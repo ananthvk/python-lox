@@ -22,5 +22,6 @@ class Lox:
         statements = parser.parse()
         if statements is not None:
             self.interpreter.interpret(statements)
-
-        return 0
+            return 0
+        else:
+            return 1
