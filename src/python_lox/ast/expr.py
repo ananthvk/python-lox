@@ -13,6 +13,10 @@ class Visitor(ABC, Generic[T]):
         pass
 
     @abstractmethod
+    def visit_assign_expr(self, expr: "Assign") -> T:
+        pass
+
+    @abstractmethod
     def visit_ternary_expr(self, expr: "Ternary") -> T:
         pass
 
@@ -47,6 +51,15 @@ class Binary(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_binary_expr(self)
+
+
+@dataclass
+class Assign(Expr):
+    name: Token
+    value: Expr
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_assign_expr(self)
 
 
 @dataclass

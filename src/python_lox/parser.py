@@ -73,7 +73,27 @@ class Parser:
     # Code for recursive descent parser
 
     def expression(self) -> expr.Expr:
-        return self.comma()
+        return self.assign()
+
+    def assign(self) -> expr.Expr:
+        exp = self.comma()
+        if self.match([TokenType.EQUAL]):
+            # Since assignment is right associative
+            equal = self.previous()
+            value = self.assign()
+
+            if isinstance(exp, expr.Variable):
+                name = exp.name
+                return expr.Assign(name=name, value=value)
+
+            if self.error_reporter is not None:
+                self.error_reporter.report(
+                    "error", "Syntax Error: Invalid assignment", token=equal
+                )
+            else:
+                raise ParserException("Syntax Error: Invalid assignment", token=equal)
+
+        return exp
 
     def comma(self) -> expr.Expr:
         """

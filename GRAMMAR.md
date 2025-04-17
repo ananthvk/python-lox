@@ -5,7 +5,8 @@ statement            = expression_statement
                       | print_statement
 print_statement      = "print" expression ";"
 expression_statement = expression ";"
-expression           = comma
+expression           = assignment
+assignment           = IDENTIFIER "=" assignment | comma
 comma                = ternary ( "," ternary )*
 ternary              = equality | equality "?" expression ":" ternary
 equality             = comparison ( ("==" | "!=") comparison)*

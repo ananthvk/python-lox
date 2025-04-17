@@ -124,6 +124,17 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 )
 
     @override
+    def visit_assign_expr(self, expr: Expr.Assign) -> object:
+        value = self.evaluate(expr.value)
+        if self.environment.get(expr.name.string_repr) is None:
+            raise RuntimeException(
+                f'Name Error: "{expr.name.string_repr}" is not defined, define it with var',
+                expr,
+            )
+        self.environment[expr.name.string_repr] = ("initialized", value)
+        return value
+
+    @override
     def visit_ternary_expr(self, expr: Expr.Ternary) -> object:
         condition = self.evaluate(expr.condition)
         if self.is_truthy(condition):

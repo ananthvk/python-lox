@@ -11,6 +11,7 @@ ast_classes = {
             ("operator", "Token"),
             ("right", "Expr"),
         ],
+        "assign": [("name", "Token"), ("value", "Expr")],
         "ternary": [
             ("condition", "Expr"),
             ("if_branch", "Expr"),

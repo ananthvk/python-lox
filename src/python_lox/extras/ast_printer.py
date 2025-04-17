@@ -43,3 +43,7 @@ class ASTPrinter(Expr.Visitor[str]):
             result.append(expression.accept(self))
 
         return f"({name} {' '.join(result)})"
+
+    @override
+    def visit_assign_expr(self, expr: Expr.Assign) -> str:
+        return self.parenthesize(f"= {expr.name.string_repr}", expr.value)
