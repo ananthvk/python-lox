@@ -45,7 +45,9 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             case TokenType.MINUS:
                 if self.is_numeric(right):
                     return -right
-                raise RuntimeException('Syntax Error: Invalid unary operator "-" for type', expr)
+                raise RuntimeException(
+                    'Syntax Error: Invalid unary operator "-" for type', expr
+                )
             case TokenType.BANG:
                 return not self.is_truthy(right)
             case TokenType.NOT:
@@ -56,6 +58,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_binary_expr(self, expr: Expr.Binary) -> object:
+        if expr.operator.token_type == TokenType.COMMA:
+            self.evaluate(expr.left)
+            return self.evaluate(expr.right)
+
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 
@@ -92,9 +98,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                         return left / right  # type: ignore
                     except ZeroDivisionError:
                         raise RuntimeException(
-                            'Runtime Error: Divide by Zero Error: division by zero', expr
+                            "Runtime Error: Divide by Zero Error: division by zero",
+                            expr,
                         )
-                        
+
                 raise RuntimeException(
                     'Type Error: Operator "/" not valid between the operands', expr
                 )
@@ -111,7 +118,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 return left <= right  # type: ignore
             case _:
                 raise RuntimeException(
-                    f'Syntax Error: Invalid operator "{expr.operator.string_repr}"', expr
+                    f'Syntax Error: Invalid operator "{expr.operator.string_repr}"',
+                    expr,
                 )
 
     @override

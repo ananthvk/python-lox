@@ -1,4 +1,7 @@
 print "hello world";
 print 3 + 2;
 print 5 + 8;
+print * 3 2
+3 = 2
 print "hello" + 8;
+3 + 2 = 5
