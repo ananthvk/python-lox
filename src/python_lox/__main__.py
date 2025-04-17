@@ -1,4 +1,6 @@
 import typer
+import os
+import readline
 import sys
 from rich import print
 
@@ -7,6 +9,12 @@ from .error_reporter import ErrorReporter
 from typing_extensions import Annotated
 
 app = typer.Typer()
+
+HISTORY_FILE = os.path.expanduser("~/.loxhistory")
+
+import atexit
+
+atexit.register(lambda: readline.write_history_file(HISTORY_FILE))
 
 
 def report_error(error_reporter: ErrorReporter, source: str) -> None:
@@ -25,9 +33,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
             if message[0] == "error":
                 print(f"[red]{message[1]} {extra_info}[/red]")
             elif message[0] == "fatal":
-                print(
-                    f"[bold][red]{message[1]} {extra_info}[/red][/bold]"
-                )
+                print(f"[bold][red]{message[1]} {extra_info}[/red][/bold]")
             else:
                 print(f"[yellow]{message[1]} {extra_info}[/yellow]")
 
@@ -55,6 +61,10 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
         if error_reporter.is_error:
             return 1
         return exit_code
+
+    # Load history
+    if os.path.exists(HISTORY_FILE):
+        readline.read_history_file(HISTORY_FILE)
 
     # Run in REPL mode
     print(

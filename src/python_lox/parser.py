@@ -40,7 +40,7 @@ class Parser:
         Similar to match, but throws an exception if the token type does not match
         """
         if not self.match(token_types):
-            token = self.peek()
+            token = self.previous()
             raise ParserException(message, token)
 
     def check(self, token_type: TokenType) -> bool:

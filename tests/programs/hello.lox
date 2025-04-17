@@ -1,10 +1,4 @@
 print "hello world";
 print 3 + 2;
-print #;
-print 3 + ;
-print 3 + ( * 5);
-print "wolrd";
-print no terminator
-print "line";
-print 3 / 0;
-print this
+print 5 + 8;
+print "hello" + 8;
