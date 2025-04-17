@@ -19,8 +19,13 @@ ast_classes = {
         "grouping": [("expression", "Expr")],
         "literal": [("value", "object")],
         "unary": [("operator", "Token"), ("right", "Expr")],
+        "variable": [("name", "Token")],
     },
-    "stmt": {"expression": [("expression", "Expr")], "print": [("expression", "Expr")]},
+    "stmt": {
+        "expression": [("expression", "Expr")],
+        "print": [("expression", "Expr")],
+        "var": [("name", "Token"), ("initializer", "Expr | None = None")],
+    },
 }
 
 module_header = """from typing import Generic, TypeVar

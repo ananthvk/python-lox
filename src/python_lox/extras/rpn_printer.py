@@ -30,3 +30,7 @@ class RPNPrinter(Expr.Visitor[str]):
     @override
     def visit_ternary_expr(self, expr: Expr.Ternary) -> str:
         return f"{expr.if_branch} {expr.else_branch} :?"
+
+    @override
+    def visit_variable_expr(self, expr: Expr.Variable) -> str:
+        return f"var {expr.name.string_repr}"

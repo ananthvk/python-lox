@@ -162,7 +162,8 @@ class Parser:
 
     def primary(self) -> expr.Expr:
         if self.match([TokenType.IDENTIFIER]):
-            return expr.Literal(value=self.previous().string_repr)
+            return expr.Variable(name=self.previous())
+
         if self.match([TokenType.FALSE]):
             return expr.Literal(value=False)
 
@@ -262,12 +263,35 @@ class Parser:
             return self.print_statement()
         return self.expression_statement()
 
+    def variable_declaration(self) -> stmt.Var:
+        if self.peek().token_type != TokenType.IDENTIFIER:
+            token = self.peek()
+            if token.token_type == TokenType.EOF:
+                token = self.previous()
+            raise ParserException("Expected variable name after var", token=token)
+
+        name = self.advance()
+
+        initializer = None
+        if self.match([TokenType.EQUAL]):
+            initializer = self.expression()
+
+        self.consume(
+            [TokenType.SEMICOLON], message='Expected ";" after variable declaration'
+        )
+        return stmt.Var(name, initializer=initializer)
+
+    def declaration(self) -> stmt.Stmt:
+        if self.match([TokenType.VAR]):
+            return self.variable_declaration()
+        return self.statement()
+
     def parse(self) -> List[stmt.Stmt] | None:
         statements: List[stmt.Stmt] = []
 
         while not self.is_at_end():
             try:
-                statements.append(self.statement())
+                statements.append(self.declaration())
             except ParserException as e:
                 if self.error_reporter is None:
                     raise e

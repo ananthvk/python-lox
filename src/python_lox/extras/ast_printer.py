@@ -30,6 +30,10 @@ class ASTPrinter(Expr.Visitor[str]):
         return self.parenthesize("?:", expr.condition, expr.if_branch, expr.else_branch)
 
     @override
+    def visit_variable_expr(self, expr: Expr.Variable) -> str:
+        return f"var {expr.name.string_repr}"
+
+    @override
     def visit_unary_expr(self, expr: Expr.Unary) -> str:
         return self.parenthesize(expr.operator.string_repr, expr.right)
 

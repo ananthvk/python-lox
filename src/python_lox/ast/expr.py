@@ -28,6 +28,10 @@ class Visitor(ABC, Generic[T]):
     def visit_unary_expr(self, expr: "Unary") -> T:
         pass
 
+    @abstractmethod
+    def visit_variable_expr(self, expr: "Variable") -> T:
+        pass
+
 
 class Expr(ABC):
     @abstractmethod
@@ -78,4 +82,12 @@ class Unary(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_unary_expr(self)
+
+
+@dataclass
+class Variable(Expr):
+    name: Token
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_variable_expr(self)
 

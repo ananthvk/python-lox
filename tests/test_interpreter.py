@@ -94,3 +94,17 @@ def test_numbers_in_other_bases():
     verify("print 0b0;")
     verify("print 0b1;")
     verify("print 0b11101;")
+
+
+def test_variables():
+    assert (
+        interpret(
+            """
+                var z = 30;
+                var y = 20;
+                var x = 10;
+                print x * y + z;
+              """
+        )
+        == "230\n"
+    )

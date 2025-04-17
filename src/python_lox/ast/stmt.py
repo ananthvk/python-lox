@@ -1,8 +1,8 @@
 from typing import Generic, TypeVar
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from ..token import Token
 from .expr import Expr
-
 
 T = TypeVar('T')
 
@@ -14,6 +14,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_print_stmt(self, stmt: "Print") -> T:
+        pass
+
+    @abstractmethod
+    def visit_var_stmt(self, stmt: "Var") -> T:
         pass
 
 
@@ -37,4 +41,13 @@ class Print(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_print_stmt(self)
+
+
+@dataclass
+class Var(Stmt):
+    name: Token
+    initializer: Expr | None = None
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_var_stmt(self)
 
