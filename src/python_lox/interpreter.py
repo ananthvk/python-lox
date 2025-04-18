@@ -2,7 +2,8 @@ from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .token import TokenType
 from .error_reporter import ErrorReporter
-from typing import TextIO, override, TypeGuard, List, Dict, Any, Tuple
+from .environment import Environment, NameException
+from typing import TextIO, override, TypeGuard, List
 import sys
 
 """
@@ -15,7 +16,7 @@ NOTES:
 
 
 class RuntimeException(Exception):
-    def __init__(self, message: str, exp: Expr.Expr) -> None:
+    def __init__(self, message: str, exp: Expr.Expr | None = None) -> None:
         super().__init__(message)
         self.exp = exp
 
@@ -28,7 +29,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         super().__init__()
         self.error_reporter = error_reporter
         self.stdout = stdout
-        self.environment: Dict[str, Any] = {}
+        self.environment = Environment()
 
     @override
     def visit_literal_expr(self, expr: Expr.Literal) -> object:
@@ -126,12 +127,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_assign_expr(self, expr: Expr.Assign) -> object:
         value = self.evaluate(expr.value)
-        if self.environment.get(expr.name.string_repr) is None:
-            raise RuntimeException(
-                f'Name Error: "{expr.name.string_repr}" is not defined, define it with var',
-                expr,
-            )
-        self.environment[expr.name.string_repr] = ("initialized", value)
+        self.environment.assign(expr.name, value)
         return value
 
     @override
@@ -204,24 +200,13 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_var_stmt(self, stmt: Stmt.Var) -> None:
-        value: Tuple[str, object | None] = ("uninitialized", None)
-        if stmt.initializer is not None:
-            value = ("initialized", self.evaluate(stmt.initializer))
-        self.environment[stmt.name.string_repr] = value
+        self.environment.declare(stmt.name)
+        if stmt.initializer:
+            self.environment.assign(stmt.name, self.evaluate(stmt.initializer))
 
     @override
     def visit_variable_expr(self, expr: Expr.Variable) -> object:
-        value = self.environment.get(expr.name.string_repr)
-        if value is None:
-            raise RuntimeException(
-                f'Name Error: "{expr.name.string_repr}" is not defined', expr
-            )
-
-        if value[0] == "uninitialized":
-            raise RuntimeException(
-                f'Value Error: "{expr.name.string_repr}" is not initialized', expr
-            )
-        return value[1]
+        return self.environment.get(expr.name)
 
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
@@ -235,3 +220,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             if self.error_reporter is None:
                 raise e
             self.error_reporter.report("error", f"{e}")
+
+        except NameException as e:
+            if self.error_reporter is None:
+                raise e
+            self.error_reporter.report("error", f"{e}", token=e.token)

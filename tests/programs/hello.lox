@@ -1,7 +1,11 @@
-print "hello world";
-print 3 + 2;
-print 5 + 8;
-print * 3 2
-3 = 2
-print "hello" + 8;
-3 + 2 = 5
+var x = 30;
+var y = 50;
+var z = 180;
+
+x = y + z;
+y = x * z;
+z = y * x * z + y * z;
+
+print x;
+print y;
+print z;

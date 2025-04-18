@@ -22,7 +22,7 @@ Visualization of AST for `5 * 6 / 3 - 2 / 5 * (6 + 8)`
 ![Visualization of AST](images/ast_visual.png)
 
 
-## Additional features
+## Additional features / modifications
 
 1) Comma operator `,` - Evaluates to it's rightmost expression
 
@@ -37,4 +37,17 @@ evaluates to 600
 For example,
 ```
 print 5 > 3 ? "Greater" : "Lesser";
+```
+
+3) Accessing uninitialized variables is an error
+```
+var x;
+print x * 20; // Error
+```
+
+4) Cannot redefine variables
+```
+var x = 20;
+var x = 50; // Error (x is already defined)
+x = 40;     // Assignment is supported
 ```
