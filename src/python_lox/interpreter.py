@@ -54,6 +54,15 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 return not self.is_truthy(right)
             case TokenType.NOT:
                 return not self.is_truthy(right)
+            case TokenType.TYPEOF:
+                if isinstance(right, bool):
+                    return "bool"
+                if isinstance(right, int) or isinstance(right, float):
+                    return "number"
+                if isinstance(right, str):
+                    return "str"
+                if right is None:
+                    return "nil"
             case _:
                 raise AssertionError("Logic error: Invalid unary operator")
         return None

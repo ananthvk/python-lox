@@ -44,6 +44,7 @@ class TokenType(Enum):
     SUPER = auto()
     THIS = auto()
     TRUE = auto()
+    TYPEOF = auto()
     UNKNOWN = auto()
     VAR = auto()
     WHILE = auto()
@@ -67,6 +68,7 @@ keywords = {
     "this": TokenType.THIS,
     "var": TokenType.VAR,
     "const": TokenType.CONST,
+    "typeof": TokenType.TYPEOF,
 }
 
 single_char_tokens = {

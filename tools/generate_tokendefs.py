@@ -29,6 +29,7 @@ tokendefs = {
         "this": "THIS",
         "var": "VAR",
         "const": "CONST",
+        "typeof": "TYPEOF",
     },
     "single_char_tokens": {
         "(": "LEFT_PAREN",
