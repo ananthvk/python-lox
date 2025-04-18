@@ -210,8 +210,13 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_var_stmt(self, stmt: Stmt.Var) -> None:
         self.environment.declare(stmt.name)
-        if stmt.initializer:
-            self.environment.assign(stmt.name, self.evaluate(stmt.initializer))
+
+        try:
+            if stmt.initializer:
+                self.environment.assign(stmt.name, self.evaluate(stmt.initializer))
+        except NameException as e:
+            del self.environment.values[stmt.name.string_repr]
+            raise e
 
     @override
     def visit_variable_expr(self, expr: Expr.Variable) -> object:

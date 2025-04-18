@@ -58,3 +58,16 @@ const name = "hello world";
 name = "hello"; // Error: Assignment not permitted
 var name = "hello"; // Error: redeclaration
 ```
+
+6) typeof operator - Returns string representing the type of the given expression
+
+```
+const name = "hello";
+const integer = 3;
+const is_valid = true;
+const value = nil;
+print typeof(name); // str
+print typeof(integer); // number
+print typeof(is_valid); // bool
+print typeof(value); // nil
+```
