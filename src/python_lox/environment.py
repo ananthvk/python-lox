@@ -44,6 +44,9 @@ class Environment:
     def get(self, token: Token) -> object:
         value = self.values.get(token.string_repr)
         if value is not None:
+            if value[0] == "uninitialized":
+                raise NameException(f'Value Error: "{token.string_repr}" is not initialized', token)
+                
             return value[1]
 
         if self.parent is not None:

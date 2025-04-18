@@ -281,7 +281,17 @@ class Parser:
         """
         if self.match([TokenType.PRINT]):
             return self.print_statement()
+        if self.match([TokenType.LEFT_BRACE]):
+            return self.block_statement()
         return self.expression_statement()
+
+    def block_statement(self) -> stmt.Block:
+        statements: List[stmt.Stmt] = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            statements.append(self.declaration())
+
+        self.consume([TokenType.RIGHT_BRACE], 'Expected "}" after block')
+        return stmt.Block(statements=statements)
 
     def variable_declaration(self) -> stmt.Var:
         if self.peek().token_type != TokenType.IDENTIFIER:

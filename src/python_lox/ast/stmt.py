@@ -1,11 +1,10 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, List
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from ..token import Token
 from .expr import Expr
 
-
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
@@ -19,6 +18,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_var_stmt(self, stmt: "Var") -> T:
+        pass
+
+    @abstractmethod
+    def visit_block_stmt(self, stmt: "Block") -> T:
         pass
 
 
@@ -51,3 +54,12 @@ class Var(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_var_stmt(self)
+
+
+@dataclass
+class Block(Stmt):
+    statements: List[Stmt]
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_block_stmt(self)
+

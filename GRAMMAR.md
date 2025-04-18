@@ -3,6 +3,8 @@ declaration          = variable_declaration | statement
 variable_declaration = "var" IDENTIFER ( "=" expression )? ";"
 statement            = expression_statement
                       | print_statement
+                      | block
+block                = "{" declaration* "}"
 print_statement      = "print" expression ";"
 expression_statement = expression ";"
 expression           = assignment

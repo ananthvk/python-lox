@@ -26,10 +26,11 @@ ast_classes = {
         "expression": [("expression", "Expr")],
         "print": [("expression", "Expr")],
         "var": [("name", "Token"), ("initializer", "Expr | None = None")],
+        "block": [("statements", "List[Stmt]")]
     },
 }
 
-module_header = """from typing import Generic, TypeVar
+module_header = """from typing import Generic, TypeVar, List
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from ..token import Token

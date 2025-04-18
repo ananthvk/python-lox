@@ -208,6 +208,17 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def visit_variable_expr(self, expr: Expr.Variable) -> object:
         return self.environment.get(expr.name)
 
+    @override
+    def visit_block_stmt(self, stmt: Stmt.Block) -> None:
+        previous_env = self.environment
+        try:
+            self.environment = Environment()
+            self.environment.parent = previous_env
+            for statement in stmt.statements:
+                self.execute(statement=statement)
+        finally:
+            self.environment = previous_env
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 
