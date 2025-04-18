@@ -219,6 +219,20 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         finally:
             self.environment = previous_env
 
+    @override
+    def visit_const_stmt(self, stmt: Stmt.Const) -> None:
+        if self.environment.values.get(stmt.name.string_repr) is None:
+            self.environment.declare(
+                stmt.name,
+                const=True,
+                val=self.evaluate(stmt.initializer),
+                initialize=True,
+            )
+
+        # This will throw an error since the variable is already declared in the current scope
+        else:
+            self.environment.declare(stmt.name)
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 

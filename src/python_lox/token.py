@@ -1,6 +1,6 @@
+
 from enum import Enum, auto
 from dataclasses import dataclass
-
 
 class TokenType(Enum):
     AND = auto()
@@ -9,6 +9,7 @@ class TokenType(Enum):
     CLASS = auto()
     COLON = auto()
     COMMA = auto()
+    CONST = auto()
     DOT = auto()
     ELSE = auto()
     EOF = auto()
@@ -47,7 +48,6 @@ class TokenType(Enum):
     VAR = auto()
     WHILE = auto()
 
-
 keywords = {
     "and": TokenType.AND,
     "or": TokenType.OR,
@@ -66,6 +66,7 @@ keywords = {
     "super": TokenType.SUPER,
     "this": TokenType.THIS,
     "var": TokenType.VAR,
+    "const": TokenType.CONST,
 }
 
 single_char_tokens = {
@@ -103,18 +104,14 @@ misc = {
     "slash": TokenType.SLASH,
 }
 
-
 @dataclass
 class Token:
     token_type: TokenType = TokenType.UNKNOWN
     line: int = 0
     literal: int | float | str | None = None
-
-    # Token spans from [start, end)
+    string_repr: str = ""
     start: int = 0
     end: int = 0
-
-    string_repr: str = ""
 
     def __repr__(self) -> str:
         if self.token_type == TokenType.IDENTIFIER:
@@ -122,7 +119,9 @@ class Token:
         elif self.token_type == TokenType.STRING:
             return f'<{self.token_type} "{self.literal}">'
         elif self.token_type == TokenType.NUMBER:
-            if isinstance(self.literal, float) or isinstance(self.literal, int):
+            if (
+                isinstance(self.literal, float) or isinstance(self.literal, int)
+            ):
                 return f"<{self.token_type} {self.literal}>"
 
         return f"<{self.token_type}>"

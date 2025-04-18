@@ -51,3 +51,10 @@ var x = 20;
 var x = 50; // Error (x is already defined)
 x = 40;     // Assignment is supported
 ```
+
+5) const variables
+```
+const name = "hello world";
+name = "hello"; // Error: Assignment not permitted
+var name = "hello"; // Error: redeclaration
+```

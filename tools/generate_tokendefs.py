@@ -28,6 +28,7 @@ tokendefs = {
         "super": "SUPER",
         "this": "THIS",
         "var": "VAR",
+        "const": "CONST",
     },
     "single_char_tokens": {
         "(": "LEFT_PAREN",
@@ -82,6 +83,8 @@ class Token:
     line: int = 0
     literal: int | float | str | None = None
     string_repr: str = ""
+    start: int = 0
+    end: int = 0
 
     def __repr__(self) -> str:
         if self.token_type == TokenType.IDENTIFIER:

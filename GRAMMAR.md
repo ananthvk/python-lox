@@ -1,6 +1,7 @@
 program              = declaration* EOF
-declaration          = variable_declaration | statement
+declaration          = const_declaration | variable_declaration | statement
 variable_declaration = "var" IDENTIFER ( "=" expression )? ";"
+const_declaration    = "const" IDENTIFIER "=" expression ";"
 statement            = expression_statement
                       | print_statement
                       | block

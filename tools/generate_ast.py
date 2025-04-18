@@ -26,7 +26,8 @@ ast_classes = {
         "expression": [("expression", "Expr")],
         "print": [("expression", "Expr")],
         "var": [("name", "Token"), ("initializer", "Expr | None = None")],
-        "block": [("statements", "List[Stmt]")]
+        "const": [("name", "Token"), ("initializer", "Expr")],
+        "block": [("statements", "List[Stmt]")],
     },
 }
 

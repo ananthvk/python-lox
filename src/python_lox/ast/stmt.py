@@ -21,6 +21,10 @@ class Visitor(ABC, Generic[T]):
         pass
 
     @abstractmethod
+    def visit_const_stmt(self, stmt: "Const") -> T:
+        pass
+
+    @abstractmethod
     def visit_block_stmt(self, stmt: "Block") -> T:
         pass
 
@@ -54,6 +58,15 @@ class Var(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_var_stmt(self)
+
+
+@dataclass
+class Const(Stmt):
+    name: Token
+    initializer: Expr
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_const_stmt(self)
 
 
 @dataclass

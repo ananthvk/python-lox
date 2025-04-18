@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Literal
+from typing import Dict, Tuple, Literal, Set
 from .token import Token
 
 EnvironmentValueType = Tuple[Literal["uninitialized", "initialized"], object]
@@ -14,8 +14,15 @@ class Environment:
     def __init__(self, parent: "Environment | None" = None) -> None:
         self.parent: Environment | None = parent
         self.values: Dict[str, EnvironmentValueType] = {}
+        self.const_variables: Set[str] = set()
 
     def assign(self, token: Token, value: object) -> None:
+        if token.string_repr in self.const_variables:
+            raise NameException(
+                f'Type Error: Assignment not permitted since "{token.string_repr}" is declared const',
+                token,
+            )
+
         v = self.values.get(token.string_repr)
         if v is not None:
             self.values[token.string_repr] = ("initialized", value)
@@ -28,7 +35,11 @@ class Environment:
         raise NameException(f'Name Error: "{token.string_repr}" is not defined', token)
 
     def declare(
-        self, token: Token, value: object | None = None, initialize: bool = False
+        self,
+        token: Token,
+        val: object | None = None,
+        initialize: bool = False,
+        const: bool = False,
     ) -> None:
         value = self.values.get(token.string_repr)
         if value is not None:
@@ -37,16 +48,20 @@ class Environment:
             )
 
         if initialize:
-            self.values[token.string_repr] = ("initialized", value)
+            self.values[token.string_repr] = ("initialized", val)
         else:
             self.values[token.string_repr] = ("uninitialized", None)
+        if const:
+            self.const_variables.add(token.string_repr)
 
     def get(self, token: Token) -> object:
         value = self.values.get(token.string_repr)
         if value is not None:
             if value[0] == "uninitialized":
-                raise NameException(f'Value Error: "{token.string_repr}" is not initialized', token)
-                
+                raise NameException(
+                    f'Value Error: "{token.string_repr}" is not initialized', token
+                )
+
             return value[1]
 
         if self.parent is not None:

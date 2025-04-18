@@ -311,9 +311,31 @@ class Parser:
         )
         return stmt.Var(name, initializer=initializer)
 
+    def const_declaration(self) -> stmt.Const:
+        if self.peek().token_type != TokenType.IDENTIFIER:
+            token = self.peek()
+            if token.token_type == TokenType.EOF:
+                token = self.previous()
+            raise ParserException("Expected variable name after const", token=token)
+
+        name = self.advance()
+
+        self.consume(
+            [TokenType.EQUAL], message="Expected initializer after const declaration"
+        )
+
+        initializer = self.expression()
+
+        self.consume(
+            [TokenType.SEMICOLON], message='Expected ";" after const declaration'
+        )
+        return stmt.Const(name, initializer=initializer)
+
     def declaration(self) -> stmt.Stmt:
         if self.match([TokenType.VAR]):
             return self.variable_declaration()
+        if self.match([TokenType.CONST]):
+            return self.const_declaration()
         return self.statement()
 
     def parse(self) -> List[stmt.Stmt] | None:
