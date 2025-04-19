@@ -1,6 +1,6 @@
 from .token import Token, TokenType
 from .ast import stmt
-from typing import List
+from typing import List, cast
 from .ast import expr
 from .error_reporter import ErrorReporter
 
@@ -321,7 +321,7 @@ class Parser:
         except ParserException as e:
             if str(e) == "Expected expression":
                 raise ParserException(
-                    "Expected valid expression after if", token=self.previous()
+                    "Expected valid expression after while", token=self.previous()
                 )
             else:
                 raise e
@@ -330,6 +330,55 @@ class Parser:
 
         body = self.block_statement()
         return stmt.While(condition=expression, body=body)
+
+    def for_statement(self) -> stmt.Stmt:
+
+        # For loop is of the form for initializer ; condition; update {}
+
+        # Parse the initializer, here we only restrict to
+        # variable_declaration and expression_statement, since other types of statements are not allowed
+        initializer = None
+        if self.match([TokenType.SEMICOLON]):
+            initializer = None
+        elif self.match([TokenType.VAR]):
+            initializer = self.variable_declaration()
+        else:
+            initializer = self.expression_statement()
+
+        expression: expr.Expr | None = None
+        if self.match([TokenType.SEMICOLON]):
+            expression = None
+        else:
+            expression = self.expression()
+            self.consume(
+                [TokenType.SEMICOLON],
+                'Expected ";" after for loop condition expression',
+            )
+
+        update: expr.Expr | None = None
+        if self.check(TokenType.LEFT_BRACE):
+            # There is no update expression
+            update = None
+        else:
+            update = self.expression()
+
+        self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "for"')
+        body = self.block_statement()
+
+        if update is not None:
+            body = stmt.Block(
+                statements=[body, cast(stmt.Stmt, stmt.Expression(expression=update))]
+            )
+
+        if expression is None:
+            expression = expr.Literal(value=True)
+
+        body = stmt.While(condition=expression, body=body)
+
+        if initializer is not None:
+            body = stmt.Block(statements=[initializer, body])
+
+        return body
 
     def statement(self) -> stmt.Stmt:
         """
@@ -346,6 +395,8 @@ class Parser:
             return self.if_statement()
         if self.match([TokenType.WHILE]):
             return self.while_statement()
+        if self.match([TokenType.FOR]):
+            return self.for_statement()
         return self.expression_statement()
 
     def block_statement(self) -> stmt.Block:

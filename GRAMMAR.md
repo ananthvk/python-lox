@@ -7,6 +7,11 @@ statement            = expression_statement
                       | block
                       | if_statement
                       | while_statement
+                      | for_statement
+for_statement        = "for" variable_declaration? ";" 
+                             expression? ";"
+                             expression? 
+                             block
 while_statement      = "while" expression block
 if_statement         = "if" expression block ("else" block)? 
 block                = "{" declaration* "}"
