@@ -257,6 +257,11 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             self.execute(stmt.else_branch)
 
     @override
+    def visit_while_stmt(self, stmt: Stmt.While) -> None:
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
+
+    @override
     def visit_logical_expr(self, expr: Expr.Logical) -> object:
         left = self.evaluate(expr.left)
 

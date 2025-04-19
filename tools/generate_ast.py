@@ -39,6 +39,7 @@ ast_classes = {
             ("if_branch", "Block"),
             ("else_branch", "Block | None = None"),
         ],
+        "while": [("condition", "Expr"), ("body", "Block")],
     },
 }
 

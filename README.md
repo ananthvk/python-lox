@@ -80,3 +80,11 @@ if x > 3 {
     // do something else
 }
 ```
+
+8) Similar to `if` statement, `while` statement does not require parenthesis, and requires a braced block
+```
+while x > 5 {
+    // Statements
+}
+```
+    

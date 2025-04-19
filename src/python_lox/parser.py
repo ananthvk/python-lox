@@ -315,6 +315,22 @@ class Parser:
 
         return stmt.If(condition=expression, if_branch=if_branch)
 
+    def while_statement(self) -> stmt.Stmt:
+        try:
+            expression = self.expression()
+        except ParserException as e:
+            if str(e) == "Expected expression":
+                raise ParserException(
+                    "Expected valid expression after if", token=self.previous()
+                )
+            else:
+                raise e
+
+        self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "while"')
+
+        body = self.block_statement()
+        return stmt.While(condition=expression, body=body)
+
     def statement(self) -> stmt.Stmt:
         """
         Parses a statement
@@ -328,6 +344,8 @@ class Parser:
             return self.block_statement()
         if self.match([TokenType.IF]):
             return self.if_statement()
+        if self.match([TokenType.WHILE]):
+            return self.while_statement()
         return self.expression_statement()
 
     def block_statement(self) -> stmt.Block:

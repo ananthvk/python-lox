@@ -6,6 +6,8 @@ statement            = expression_statement
                       | print_statement
                       | block
                       | if_statement
+                      | while_statement
+while_statement      = "while" expression block
 if_statement         = "if" expression block ("else" block)? 
 block                = "{" declaration* "}"
 print_statement      = "print" expression ";"
