@@ -30,6 +30,8 @@ tokendefs = {
         "var": "VAR",
         "const": "CONST",
         "typeof": "TYPEOF",
+        "break": "BREAK",
+        "continue": "CONTINUE"
     },
     "single_char_tokens": {
         "(": "LEFT_PAREN",

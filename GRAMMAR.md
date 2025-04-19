@@ -8,6 +8,10 @@ statement            = expression_statement
                       | if_statement
                       | while_statement
                       | for_statement
+                      | break_statement
+                      | continue_statement
+break_statement      = "break" ";"
+continue_statement   = "continue" ";"
 for_statement        = "for" variable_declaration? ";" 
                              expression? ";"
                              expression? 

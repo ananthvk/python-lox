@@ -1,6 +1,6 @@
 from .token import Token, TokenType
 from .ast import stmt
-from typing import List, cast
+from typing import List, cast, Any
 from .ast import expr
 from .error_reporter import ErrorReporter
 
@@ -337,7 +337,7 @@ class Parser:
 
         # Parse the initializer, here we only restrict to
         # variable_declaration and expression_statement, since other types of statements are not allowed
-        initializer = None
+        initializer: stmt.Stmt | None = None
         if self.match([TokenType.SEMICOLON]):
             initializer = None
         elif self.match([TokenType.VAR]):
@@ -363,7 +363,7 @@ class Parser:
             update = self.expression()
 
         self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "for"')
-        body = self.block_statement()
+        body: stmt.Stmt = cast(stmt.Stmt, self.block_statement())
 
         if update is not None:
             body = stmt.Block(
@@ -373,7 +373,9 @@ class Parser:
         if expression is None:
             expression = expr.Literal(value=True)
 
-        body = stmt.While(condition=expression, body=body)
+        body = cast(
+            stmt.Stmt, stmt.While(condition=expression, body=cast(stmt.Block, body))
+        )
 
         if initializer is not None:
             body = stmt.Block(statements=[initializer, body])

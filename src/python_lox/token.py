@@ -6,10 +6,12 @@ class TokenType(Enum):
     AND = auto()
     BANG = auto()
     BANG_EQUAL = auto()
+    BREAK = auto()
     CLASS = auto()
     COLON = auto()
     COMMA = auto()
     CONST = auto()
+    CONTINUE = auto()
     DOT = auto()
     ELSE = auto()
     EOF = auto()
@@ -70,6 +72,8 @@ keywords = {
     "var": TokenType.VAR,
     "const": TokenType.CONST,
     "typeof": TokenType.TYPEOF,
+    "break": TokenType.BREAK,
+    "continue": TokenType.CONTINUE,
 }
 
 single_char_tokens = {
