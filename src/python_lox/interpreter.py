@@ -21,6 +21,14 @@ class RuntimeException(Exception):
         self.exp = exp
 
 
+class BreakException(Exception):
+    pass
+
+
+class ContinueException(Exception):
+    pass
+
+
 class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     def __init__(
@@ -259,7 +267,36 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_while_stmt(self, stmt: Stmt.While) -> None:
         while self.is_truthy(self.evaluate(stmt.condition)):
-            self.execute(stmt.body)
+            try:
+                self.execute(stmt.body)
+            except BreakException:
+                break
+            except ContinueException:
+                continue
+
+    @override
+    def visit_for_stmt(self, stmt: Stmt.For) -> None:
+        if stmt.initializer:
+            self.execute(stmt.initializer)
+        while self.is_truthy(self.evaluate(stmt.condition) if stmt.condition else True):
+            try:
+                self.execute(stmt.body)
+                if stmt.update:
+                    self.evaluate(stmt.update)
+            except BreakException:
+                break
+            except ContinueException:
+                if stmt.update:
+                    self.evaluate(stmt.update)
+                continue
+
+    @override
+    def visit_break_stmt(self, stmt: Stmt.Break) -> None:
+        raise BreakException()
+
+    @override
+    def visit_continue_stmt(self, stmt: Stmt.Continue) -> None:
+        raise ContinueException()
 
     @override
     def visit_logical_expr(self, expr: Expr.Logical) -> object:

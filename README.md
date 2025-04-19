@@ -22,7 +22,7 @@ Visualization of AST for `5 * 6 / 3 - 2 / 5 * (6 + 8)`
 ![Visualization of AST](images/ast_visual.png)
 
 
-## Additional features / modifications
+## Additional features / modifications / challenges
 
 1) Comma operator `,` - Evaluates to it's rightmost expression
 
@@ -95,3 +95,12 @@ for var i = 0; i < 10; i = i + 1 {
 }
 ```
 
+10) `break` and `continue` statement - works like regular break and continue from other languages
+```
+for var i = 0; i < 10; i = i + 1 {
+    print i;
+    if i == 5 {
+        break;
+    }
+}
+```

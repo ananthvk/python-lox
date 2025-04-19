@@ -36,6 +36,18 @@ class Visitor(ABC, Generic[T]):
     def visit_while_stmt(self, stmt: "While") -> T:
         pass
 
+    @abstractmethod
+    def visit_for_stmt(self, stmt: "For") -> T:
+        pass
+
+    @abstractmethod
+    def visit_break_stmt(self, stmt: "Break") -> T:
+        pass
+
+    @abstractmethod
+    def visit_continue_stmt(self, stmt: "Continue") -> T:
+        pass
+
 
 class Stmt(ABC):
     @abstractmethod
@@ -102,3 +114,28 @@ class While(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_while_stmt(self)
+
+
+@dataclass
+class For(Stmt):
+    body: Block
+    initializer: Stmt | None = None
+    condition: Expr | None = None
+    update: Expr | None = None
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_for_stmt(self)
+
+
+@dataclass
+class Break(Stmt):
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_break_stmt(self)
+
+
+@dataclass
+class Continue(Stmt):
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_continue_stmt(self)

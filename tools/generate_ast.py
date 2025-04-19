@@ -1,9 +1,9 @@
 import typer
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 from pathlib import Path
 from rich import print
 
-ast_classes = {
+ast_classes: Dict[str, Any] = {
     "expr": {
         "binary": [
             # Variable name, Type hints, Default value (if any)
@@ -40,6 +40,14 @@ ast_classes = {
             ("else_branch", "Block | None = None"),
         ],
         "while": [("condition", "Expr"), ("body", "Block")],
+        "for": [
+            ("body", "Block"),
+            ("initializer", "Stmt | None = None"),
+            ("condition", "Expr | None = None"),
+            ("update", "Expr | None = None"),
+        ],
+        "break": [],
+        "continue": [],
     },
 }
 

@@ -1,6 +1,6 @@
 from .token import Token, TokenType
 from .ast import stmt
-from typing import List, cast, Any
+from typing import List
 from .ast import expr
 from .error_reporter import ErrorReporter
 
@@ -17,6 +17,7 @@ class Parser:
     ) -> None:
         self.tokens = tokens
         self.error_reporter = error_reporter
+        self.loop_depth = 0
 
         # Next token to be processed
         self.current = 0
@@ -328,10 +329,14 @@ class Parser:
 
         self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "while"')
 
-        body = self.block_statement()
-        return stmt.While(condition=expression, body=body)
+        try:
+            self.loop_depth += 1
+            body = self.block_statement()
+            return stmt.While(condition=expression, body=body)
+        finally:
+            self.loop_depth -= 1
 
-    def for_statement(self) -> stmt.Stmt:
+    def for_statement(self) -> stmt.For:
 
         # For loop is of the form for initializer ; condition; update {}
 
@@ -363,24 +368,35 @@ class Parser:
             update = self.expression()
 
         self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "for"')
-        body: stmt.Stmt = cast(stmt.Stmt, self.block_statement())
+        try:
+            self.loop_depth += 1
+            body: stmt.Block = self.block_statement()
+        finally:
+            self.loop_depth -= 1
 
-        if update is not None:
-            body = stmt.Block(
-                statements=[body, cast(stmt.Stmt, stmt.Expression(expression=update))]
-            )
-
-        if expression is None:
-            expression = expr.Literal(value=True)
-
-        body = cast(
-            stmt.Stmt, stmt.While(condition=expression, body=cast(stmt.Block, body))
+        return stmt.For(
+            initializer=initializer, body=body, condition=expression, update=update
         )
 
-        if initializer is not None:
-            body = stmt.Block(statements=[initializer, body])
+    def break_statement(self) -> stmt.Break:
+        if self.loop_depth > 0:
+            self.consume(
+                [TokenType.SEMICOLON],
+                'Expected ";" after break statement',
+            )
+            return stmt.Break()
 
-        return body
+        raise ParserException('"break" outside loop', token=self.previous())
+
+    def continue_statement(self) -> stmt.Continue:
+        if self.loop_depth > 0:
+            self.consume(
+                [TokenType.SEMICOLON],
+                'Expected ";" after continue statement',
+            )
+            return stmt.Continue()
+
+        raise ParserException('"continue" outside loop', token=self.previous())
 
     def statement(self) -> stmt.Stmt:
         """
@@ -399,6 +415,10 @@ class Parser:
             return self.while_statement()
         if self.match([TokenType.FOR]):
             return self.for_statement()
+        if self.match([TokenType.BREAK]):
+            return self.break_statement()
+        if self.match([TokenType.CONTINUE]):
+            return self.continue_statement()
         return self.expression_statement()
 
     def block_statement(self) -> stmt.Block:
