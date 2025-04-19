@@ -10,10 +10,12 @@ if_statement         = "if" expression block ("else" block)?
 block                = "{" declaration* "}"
 print_statement      = "print" expression ";"
 expression_statement = expression ";"
-expression           = assignment
-assignment           = IDENTIFIER "=" assignment | comma
-comma                = ternary ( "," ternary )*
-ternary              = equality | equality "?" expression ":" ternary
+expression           = comma
+comma                = assignment ( "," assignment )*
+assignment           = IDENTIFIER "=" assignment | ternary
+ternary              = logical_or | logical_or "?" expression ":" ternary
+logical_or           = logical_and ("or" logical_and)*
+logical_and          = equality ("and" equality)*
 equality             = comparison ( ("==" | "!=") comparison)*
 comparison           = term | ( (">" | ">=" | "<" | "<=") term)*
 term                 = factor | ( ("+" | "-") factor)*

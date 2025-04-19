@@ -255,6 +255,20 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         elif stmt.else_branch:
             self.execute(stmt.else_branch)
 
+    @override
+    def visit_logical_expr(self, expr: Expr.Logical) -> object:
+        left = self.evaluate(expr.left)
+
+        if expr.operator.token_type == TokenType.OR:
+            # For or operator, if left is true, return it, and do not evaluate the rest
+            if self.is_truthy(left):
+                return left
+        else:
+            # For and operator, if left is false, return it and do not evaulate the rest
+            if not self.is_truthy(left):
+                return left
+        return self.evaluate(expr.right)
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 

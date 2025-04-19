@@ -47,3 +47,7 @@ class ASTPrinter(Expr.Visitor[str]):
     @override
     def visit_assign_expr(self, expr: Expr.Assign) -> str:
         return self.parenthesize(f"= {expr.name.string_repr}", expr.value)
+
+    @override
+    def visit_logical_expr(self, expr: Expr.Logical) -> str:
+        return self.parenthesize(expr.operator.string_repr, expr.left, expr.right)

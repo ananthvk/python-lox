@@ -36,6 +36,10 @@ class Visitor(ABC, Generic[T]):
     def visit_variable_expr(self, expr: "Variable") -> T:
         pass
 
+    @abstractmethod
+    def visit_logical_expr(self, expr: "Logical") -> T:
+        pass
+
 
 class Expr(ABC):
     @abstractmethod
@@ -103,4 +107,14 @@ class Variable(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_variable_expr(self)
+
+
+@dataclass
+class Logical(Expr):
+    left: Expr
+    operator: Token
+    right: Expr
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_logical_expr(self)
 

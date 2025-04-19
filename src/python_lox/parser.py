@@ -113,7 +113,7 @@ class Parser:
         In precedence chart, ternery operator's precedence > comma, but is less than equality
         """
         # A ternary expression is of the form: equality?equality:ternary
-        exp = self.equality()
+        exp = self.logical_or()
 
         # Look for a ?
         if self.match([TokenType.QUESTION_MARK]):
@@ -130,6 +130,22 @@ class Parser:
             exp = expr.Ternary(
                 condition=exp, if_branch=if_branch, else_branch=else_branch
             )
+        return exp
+
+    def logical_or(self) -> expr.Expr:
+        exp = self.logical_and()
+        while self.match([TokenType.OR]):
+            operator = self.previous()
+            right = self.logical_and()
+            exp = expr.Logical(left=exp, operator=operator, right=right)
+        return exp
+
+    def logical_and(self) -> expr.Expr:
+        exp = self.equality()
+        while self.match([TokenType.AND]):
+            operator = self.previous()
+            right = self.equality()
+            exp = expr.Logical(left=exp, operator=operator, right=right)
         return exp
 
     def equality(self) -> expr.Expr:

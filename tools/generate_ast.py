@@ -21,6 +21,12 @@ ast_classes = {
         "literal": [("value", "object")],
         "unary": [("operator", "Token"), ("right", "Expr")],
         "variable": [("name", "Token")],
+        "logical": [
+            # Variable name, Type hints, Default value (if any)
+            ("left", "Expr"),
+            ("operator", "Token"),
+            ("right", "Expr"),
+        ],
     },
     "stmt": {
         "expression": [("expression", "Expr")],
