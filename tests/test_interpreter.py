@@ -1,22 +1,4 @@
-from python_lox.interpreter import Interpreter
-from python_lox.lexer import Lexer
-from python_lox.parser import Parser
-from io import StringIO
-
-
-def interpret(expression: str):
-    lexer = Lexer(expression)
-    parser = Parser(lexer.process())
-    expr = parser.parse()
-    if expr is None:
-        raise RuntimeError()
-
-    outfile = StringIO()
-
-    interpreter = Interpreter(stdout=outfile)
-    interpreter.interpret(expr)
-    outfile.seek(0)
-    return outfile.read()
+from .conftest import interpret
 
 
 def verify(expression: str):
@@ -94,6 +76,12 @@ def test_numbers_in_other_bases():
     verify("print 0b0;")
     verify("print 0b1;")
     verify("print 0b11101;")
+    verify("print (5 + 3) * 2;")
+    verify("print 7 - (3 + 2);")
+    verify("print 10 / (2 + 3);")
+    verify("print (8 - 3) * (2 + 4);")
+    verify("print (10 - 3) / (2 + 1);")
+    verify("print (5 + 2) * (3 - 1) / 2;")
 
 
 def test_variables():

@@ -1,0 +1,13 @@
+// This is a sample program to demonstrate if statements
+
+// Three sides of a triangle
+
+var a = 3;
+var b = 4;
+var c = 5;
+
+if (a + b <= c) or (b + c <= a) or (c + a <= b) {
+    print "Not a triangle";
+} else {
+    print "Can form a triangle";
+}
