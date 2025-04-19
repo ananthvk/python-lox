@@ -7,6 +7,7 @@ from rich import print
 from .lox import Lox
 from .error_reporter import ErrorReporter
 from typing_extensions import Annotated
+import sys
 
 app = typer.Typer()
 
@@ -59,8 +60,8 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
         exit_code = lox.run(source)
         report_error(error_reporter, source)
         if error_reporter.is_error:
-            return 1
-        return exit_code
+            sys.exit(1)
+        sys.exit(exit_code)
 
     # Load history
     if os.path.exists(HISTORY_FILE):

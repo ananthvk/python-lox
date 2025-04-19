@@ -1,0 +1,19 @@
+var a = "global a";
+var b = "global b";
+var c = "global c";
+{
+  var a = "outer a";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    assert a == "inner a";
+    assert b == "outer b";
+    assert c == "global c";
+  }
+  assert a == "outer a";
+  assert b == "outer b";
+  assert c == "global c";
+}
+assert a == "global a";
+assert b == "global b";
+assert c == "global c";

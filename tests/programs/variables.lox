@@ -1,0 +1,12 @@
+var a = 3;
+var b = 50;
+var c = 40;
+var d = a * b + c;
+assert d == 190;
+
+c = b;
+assert c == 50;
+
+const efg = 50;
+var hij = efg;
+assert hij == 50;

@@ -1,5 +1,6 @@
 from .conftest import interpret
 from python_lox.environment import NameException
+from python_lox.interpreter import RuntimeException
 import pytest
 
 
@@ -315,4 +316,128 @@ def test_typeof():
             """
         )
         == "number\nstr\nbool\n"
+    )
+
+
+def test_assert():
+    with pytest.raises(RuntimeException):
+        interpret(
+            """
+                assert 3 == 2;
+            """
+        )
+
+    with pytest.raises(RuntimeException):
+        interpret(
+            """
+                assert 3 == 2, "3 is not equal to 2";
+            """
+        )
+
+    # Assert with true condition
+    assert (
+        interpret(
+            """
+                assert 5 > 3;
+                print "Assertion passed.";
+            """
+        )
+        == "Assertion passed.\n"
+    )
+
+    # Assert with false condition
+    with pytest.raises(RuntimeException):
+        interpret(
+            """
+                assert 5 < 3;
+            """
+        )
+
+    # Assert with true condition and custom message
+    assert (
+        interpret(
+            """
+                assert 10 == 10, "10 should be equal to 10";
+                print "Assertion passed.";
+            """
+        )
+        == "Assertion passed.\n"
+    )
+
+    # Assert with false condition and custom message
+    with pytest.raises(RuntimeException):
+        interpret(
+            """
+                assert 10 != 10, "10 should not be equal to 10";
+            """
+        )
+
+    # Assert with logical AND
+    assert (
+        interpret(
+            """
+                assert true and true;
+                print "Logical AND assertion passed.";
+            """
+        )
+        == "Logical AND assertion passed.\n"
+    )
+
+    # Assert with logical OR
+    assert (
+        interpret(
+            """
+                assert true or false;
+                print "Logical OR assertion passed.";
+            """
+        )
+        == "Logical OR assertion passed.\n"
+    )
+
+    # Assert with logical NOT
+    assert (
+        interpret(
+            """
+                assert !false;
+                print "Logical NOT assertion passed.";
+            """
+        )
+        == "Logical NOT assertion passed.\n"
+    )
+
+    # Assert with variable comparison
+    assert (
+        interpret(
+            """
+                var x = 20;
+                var y = 20;
+                assert x == y;
+                print "Variable comparison assertion passed.";
+            """
+        )
+        == "Variable comparison assertion passed.\n"
+    )
+
+    # Assert with arithmetic expression
+    assert (
+        interpret(
+            """
+                assert (5 + 5) == 10;
+                print "Arithmetic expression assertion passed.";
+            """
+        )
+        == "Arithmetic expression assertion passed.\n"
+    )
+
+    # Assert with combined conditions
+    assert (
+        interpret(
+            """
+                var x = 10;
+                var y = 20;
+                assert (x < y) and (y > x);
+                print "Combined condition assertion passed.";
+            """
+        )
+        == "Combined condition assertion passed.\n"
     )
