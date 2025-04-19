@@ -73,10 +73,22 @@ class Parser:
     # Code for recursive descent parser
 
     def expression(self) -> expr.Expr:
-        return self.assign()
+        return self.comma()
+
+    def comma(self) -> expr.Expr:
+        """
+        The comma operator has the lowest precedence among all operators, and it evaluates to it's rightmost expression
+        It can be of the form comma ("," comma)*
+        """
+        exp = self.assign()
+        while self.match([TokenType.COMMA]):
+            operator = self.previous()
+            right = self.assign()
+            exp = expr.Binary(left=exp, operator=operator, right=right)
+        return exp
 
     def assign(self) -> expr.Expr:
-        exp = self.comma()
+        exp = self.ternary()
         if self.match([TokenType.EQUAL]):
             # Since assignment is right associative
             equal = self.previous()
@@ -93,18 +105,6 @@ class Parser:
             else:
                 raise ParserException("Syntax Error: Invalid assignment", token=equal)
 
-        return exp
-
-    def comma(self) -> expr.Expr:
-        """
-        The comma operator has the lowest precedence among all operators, and it evaluates to it's rightmost expression
-        It can be of the form comma ("," comma)*
-        """
-        exp = self.ternary()
-        while self.match([TokenType.COMMA]):
-            operator = self.previous()
-            right = self.ternary()
-            exp = expr.Binary(left=exp, operator=operator, right=right)
         return exp
 
     def ternary(self) -> expr.Expr:
