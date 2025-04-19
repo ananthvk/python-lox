@@ -268,3 +268,169 @@ def test_for_loop():
         )
         == "4\n"
     )
+
+
+def test_continue_and_break():
+    assert (
+        interpret(
+            """
+                for var x = 0; x < 5; x = x + 1 {
+                    if (x == 2) {
+                        continue;
+                    }
+                    print x;
+                }
+            """
+        )
+        == "0\n1\n3\n4\n"
+    )
+
+    assert (
+        interpret(
+            """
+                for var x = 0; x < 5; x = x + 1 {
+                    if (x == 3) {
+                        break;
+                    }
+                    print x;
+                }
+            """
+        )
+        == "0\n1\n2\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var x = 0;
+                while (x < 5) {
+                    x = x + 1;
+                    if (x % 2 == 0) {
+                        continue;
+                    }
+                    print x;
+                }
+            """
+        )
+        == "1\n3\n5\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var x = 0;
+                while (x < 5) {
+                    if (x == 3) {
+                        break;
+                    }
+                    print x;
+                    x = x + 1;
+                }
+            """
+        )
+        == "0\n1\n2\n"
+    )
+
+    assert (
+        interpret(
+            """
+                for var x = 0; x < 10; x = x + 1 {
+                    if (x % 3 == 0) {
+                        continue;
+                    }
+                    print x;
+                }
+            """
+        )
+        == "1\n2\n4\n5\n7\n8\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var sum = 0;
+                for var x = 1; x <= 10; x = x + 1 {
+                    if (x > 5) {
+                        break;
+                    }
+                    sum = sum + x;
+                }
+                print sum;
+            """
+        )
+        == "15\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var count = 0;
+                for var x = 0; x < 10; x = x + 1 {
+                    if (x % 2 == 0) {
+                        continue;
+                    }
+                    count = count + 1;
+                }
+                print count;
+            """
+        )
+        == "5\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var x = 0;
+                while (x < 10) {
+                    if (x == 7) {
+                        break;
+                    }
+                    if (x % 2 == 0) {
+                        x = x + 1;
+                        continue;
+                    }
+                    print x;
+                    x = x + 1;
+                }
+            """
+        )
+        == "1\n3\n5\n"
+    )
+
+    assert (
+        interpret(
+            """
+                for var x = 0; x < 10; x = x + 1 {
+                    if (x % 2 != 0) {
+                        continue;
+                    }
+                    if (x == 6) {
+                        break;
+                    }
+                    print x;
+                }
+            """
+        )
+        == "0\n2\n4\n"
+    )
+
+    assert (
+        interpret(
+            """
+                var x = 0;
+                var sum = 0;
+                while (x < 10) {
+                    x = x + 1;
+                    if (x % 3 == 0) {
+                        continue;
+                    }
+                    if (x > 7) {
+                        break;
+                    }
+                    sum = sum + x;
+                }
+                print sum;
+            """
+        )
+        == "19\n"
+    )
