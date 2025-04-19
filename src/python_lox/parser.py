@@ -235,7 +235,7 @@ class Parser:
             self.factor()
             raise ParserException("Left hand operand missing", token=err_token)
 
-        raise ParserException("Invalid syntax", token=self.previous())
+        raise ParserException("Expected expression", token=self.previous())
 
     def synchronize(self) -> None:
         """
@@ -274,6 +274,31 @@ class Parser:
         self.consume([TokenType.SEMICOLON], 'Expected ";" at end of statement')
         return statement
 
+    def if_statement(self) -> stmt.If:
+        # "if" has been matched, match an expression and a block
+        try:
+            expression = self.expression()
+        except ParserException as e:
+            if str(e) == "Expected expression":
+                raise ParserException(
+                    "Expected valid expression after if", token=self.previous()
+                )
+            else:
+                raise e
+
+        self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "if"')
+
+        if_branch = self.block_statement()
+
+        if self.match([TokenType.ELSE]):
+            self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "else"')
+            else_branch = self.block_statement()
+            return stmt.If(
+                condition=expression, if_branch=if_branch, else_branch=else_branch
+            )
+
+        return stmt.If(condition=expression, if_branch=if_branch)
+
     def statement(self) -> stmt.Stmt:
         """
         Parses a statement
@@ -285,6 +310,8 @@ class Parser:
             return self.print_statement()
         if self.match([TokenType.LEFT_BRACE]):
             return self.block_statement()
+        if self.match([TokenType.IF]):
+            return self.if_statement()
         return self.expression_statement()
 
     def block_statement(self) -> stmt.Block:

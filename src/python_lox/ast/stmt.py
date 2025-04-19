@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..token import Token
 from .expr import Expr
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Visitor(ABC, Generic[T]):
@@ -26,6 +26,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_block_stmt(self, stmt: "Block") -> T:
+        pass
+
+    @abstractmethod
+    def visit_if_stmt(self, stmt: "If") -> T:
         pass
 
 
@@ -76,3 +80,12 @@ class Block(Stmt):
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_block_stmt(self)
 
+
+@dataclass
+class If(Stmt):
+    condition: Expr
+    if_branch: Block
+    else_branch: Block | None = None
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_if_stmt(self)

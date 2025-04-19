@@ -28,6 +28,11 @@ ast_classes = {
         "var": [("name", "Token"), ("initializer", "Expr | None = None")],
         "const": [("name", "Token"), ("initializer", "Expr")],
         "block": [("statements", "List[Stmt]")],
+        "if": [
+            ("condition", "Expr"),
+            ("if_branch", "Block"),
+            ("else_branch", "Block | None = None"),
+        ],
     },
 }
 

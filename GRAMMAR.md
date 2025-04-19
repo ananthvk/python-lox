@@ -5,6 +5,8 @@ const_declaration    = "const" IDENTIFIER "=" expression ";"
 statement            = expression_statement
                       | print_statement
                       | block
+                      | if_statement
+if_statement         = "if" expression block ("else" block)? 
 block                = "{" declaration* "}"
 print_statement      = "print" expression ";"
 expression_statement = expression ";"

@@ -71,3 +71,12 @@ print typeof(integer); // number
 print typeof(is_valid); // bool
 print typeof(value); // nil
 ```
+
+7) `if` statement does not require parenthesis to enclose the condition. `if` and `else` statements require braced block after it, like Go and Rust. This also solves the dangling else problem.
+```
+if x > 3 { 
+    // do something here
+} else {
+    // do something else
+}
+```

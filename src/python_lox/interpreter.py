@@ -247,6 +247,14 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         else:
             self.environment.declare(stmt.name)
 
+    @override
+    def visit_if_stmt(self, stmt: Stmt.If) -> None:
+        result = self.evaluate(stmt.condition)
+        if self.is_truthy(result):
+            self.execute(stmt.if_branch)
+        elif stmt.else_branch:
+            self.execute(stmt.else_branch)
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 
