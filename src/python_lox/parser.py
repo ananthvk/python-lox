@@ -182,7 +182,7 @@ class Parser:
 
     def factor(self) -> expr.Expr:
         exp = self.unary()
-        while self.match([TokenType.STAR, TokenType.SLASH]):
+        while self.match([TokenType.STAR, TokenType.SLASH, TokenType.PERCENTAGE]):
             operator = self.previous()
             right = self.unary()
             exp = expr.Binary(left=exp, operator=operator, right=right)

@@ -116,9 +116,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 raise RuntimeException(
                     'Type Error: Operator "/" not valid between the operands', expr
                 )
+            case TokenType.PERCENTAGE:
+                return left % right  # type: ignore
             case TokenType.PLUS:
                 return left + right  # type: ignore
-
             case TokenType.GREATER:
                 return left > right  # type: ignore
             case TokenType.GREATER_EQUAL:

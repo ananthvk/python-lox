@@ -31,6 +31,7 @@ class TokenType(Enum):
     NOT = auto()
     NUMBER = auto()
     OR = auto()
+    PERCENTAGE = auto()
     PLUS = auto()
     PRINT = auto()
     QUESTION_MARK = auto()
@@ -88,6 +89,7 @@ single_char_tokens = {
     "=": TokenType.EQUAL,
     ":": TokenType.COLON,
     "?": TokenType.QUESTION_MARK,
+    "%": TokenType.PERCENTAGE,
 }
 
 double_char_tokens = {

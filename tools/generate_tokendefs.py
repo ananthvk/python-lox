@@ -48,6 +48,7 @@ tokendefs = {
         "=": "EQUAL",
         ":": "COLON",
         "?": "QUESTION_MARK",
+        "%": "PERCENTAGE",
     },
     "double_char_tokens": {
         "!=": "BANG_EQUAL",

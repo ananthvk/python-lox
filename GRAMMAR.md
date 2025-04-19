@@ -19,7 +19,7 @@ logical_and          = equality ("and" equality)*
 equality             = comparison ( ("==" | "!=") comparison)*
 comparison           = term | ( (">" | ">=" | "<" | "<=") term)*
 term                 = factor | ( ("+" | "-") factor)*
-factor               = unary | ( ("*" | "/") unary)*
+factor               = unary | ( ("*" | "/" | "%") unary)*
 unary                = (("!" | "-" | "not") unary) | primary
 primary              = "false" | "true" | "nil"
                       | NUMBER | STRING | "(" expression ")"
