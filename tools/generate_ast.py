@@ -48,6 +48,10 @@ ast_classes: Dict[str, Any] = {
         ],
         "break": [],
         "continue": [],
+        "assert": [
+            ("expression", "Expr"),
+            ("message_expression", "Expr | None = None"),
+        ],
     },
 }
 

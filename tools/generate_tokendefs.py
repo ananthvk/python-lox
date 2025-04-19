@@ -31,7 +31,8 @@ tokendefs = {
         "const": "CONST",
         "typeof": "TYPEOF",
         "break": "BREAK",
-        "continue": "CONTINUE"
+        "continue": "CONTINUE",
+        "assert": "ASSERT",
     },
     "single_char_tokens": {
         "(": "LEFT_PAREN",

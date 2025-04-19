@@ -398,6 +398,19 @@ class Parser:
 
         raise ParserException('"continue" outside loop', token=self.previous())
 
+    def assert_statement(self) -> stmt.Assert:
+        exp = self.logical_or()
+        message_expression = None
+
+        if self.match([TokenType.COMMA]):
+            message_expression = self.expression()
+
+        self.consume(
+            [TokenType.SEMICOLON],
+            'Expected ";" after statement',
+        )
+        return stmt.Assert(exp, message_expression=message_expression)
+
     def statement(self) -> stmt.Stmt:
         """
         Parses a statement
@@ -419,6 +432,8 @@ class Parser:
             return self.break_statement()
         if self.match([TokenType.CONTINUE]):
             return self.continue_statement()
+        if self.match([TokenType.ASSERT]):
+            return self.assert_statement()
         return self.expression_statement()
 
     def block_statement(self) -> stmt.Block:

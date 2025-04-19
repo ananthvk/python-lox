@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 class TokenType(Enum):
     AND = auto()
+    ASSERT = auto()
     BANG = auto()
     BANG_EQUAL = auto()
     BREAK = auto()
@@ -74,6 +75,7 @@ keywords = {
     "typeof": TokenType.TYPEOF,
     "break": TokenType.BREAK,
     "continue": TokenType.CONTINUE,
+    "assert": TokenType.ASSERT,
 }
 
 single_char_tokens = {

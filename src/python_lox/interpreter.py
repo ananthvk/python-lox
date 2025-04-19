@@ -312,6 +312,17 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 return left
         return self.evaluate(expr.right)
 
+    @override
+    def visit_assert_stmt(self, stmt: Stmt.Assert) -> None:
+        if not self.is_truthy(self.evaluate(stmt.expression)):
+            if stmt.message_expression:
+                raise RuntimeException(
+                    f"Assertion Error: {self.evaluate(stmt.message_expression)}",
+                    exp=stmt.expression,
+                )
+            else:
+                raise RuntimeException("Assertion Error: ", exp=stmt.expression)
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 

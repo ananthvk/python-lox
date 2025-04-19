@@ -10,6 +10,8 @@ statement            = expression_statement
                       | for_statement
                       | break_statement
                       | continue_statement
+                      | assert_statement
+assert_statement     = "assert" logical_or ("," expression)? ";"
 break_statement      = "break" ";"
 continue_statement   = "continue" ";"
 for_statement        = "for" variable_declaration? ";" 
