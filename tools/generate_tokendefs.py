@@ -58,6 +58,11 @@ tokendefs = {
         ">=": "GREATER_EQUAL",
         "<=": "LESS_EQUAL",
         "==": "EQUAL_EQUAL",
+        "+=": "PLUS_EQUAL",
+        "-=": "MINUS_EQUAL",
+        "*=": "STAR_EQUAL",
+        "/=": "SLASH_EQUAL",
+        "%=": "PERCENTAGE_EQUAL",
     },
     "misc": {
         "identifier": "IDENTIFIER",

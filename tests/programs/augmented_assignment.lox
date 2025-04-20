@@ -1,0 +1,25 @@
+var a = 5;
+var b = 10;
+
+var c;
+
+c = 8;
+c *= a + b;
+assert c == 120;
+assert c != 8;
+
+c = 8;
+c /= a + b;
+assert (c - 0.5333333) < 1e-5;
+
+c = 8;
+c -= a + b;
+assert c == -7;
+
+c = 8;
+c += a + b;
+assert c == 23;
+
+c = 8;
+c %= a + b;
+assert c == 8;

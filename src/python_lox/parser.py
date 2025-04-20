@@ -2,6 +2,7 @@ from .token import Token, TokenType
 from .ast import stmt
 from typing import List
 from .ast import expr
+from copy import copy
 from .error_reporter import ErrorReporter
 
 
@@ -90,21 +91,64 @@ class Parser:
 
     def assign(self) -> expr.Expr:
         exp = self.ternary()
-        if self.match([TokenType.EQUAL]):
+        if self.match(
+            [
+                TokenType.EQUAL,
+                TokenType.PLUS_EQUAL,
+                TokenType.STAR_EQUAL,
+                TokenType.SLASH_EQUAL,
+                TokenType.PERCENTAGE_EQUAL,
+                TokenType.MINUS_EQUAL,
+            ]
+        ):
             # Since assignment is right associative
-            equal = self.previous()
+            operator = self.previous()
             value = self.assign()
 
             if isinstance(exp, expr.Variable):
                 name = exp.name
-                return expr.Assign(name=name, value=value)
+                # Desugar to get binary + assignment
+                op: Token = copy(operator)
+                match operator.token_type:
+                    case TokenType.PLUS_EQUAL:
+                        op.token_type = TokenType.PLUS
+                        op.string_repr = "+"
+                    case TokenType.MINUS_EQUAL:
+                        op.token_type = TokenType.MINUS
+                        op.string_repr = "-"
+                    case TokenType.STAR_EQUAL:
+                        op.token_type = TokenType.STAR
+                        op.string_repr = "*"
+                    case TokenType.SLASH_EQUAL:
+                        op.token_type = TokenType.SLASH
+                        op.string_repr = "/"
+                    case TokenType.PERCENTAGE_EQUAL:
+                        op.token_type = TokenType.PERCENTAGE
+                        op.string_repr = "%"
+                    case TokenType.EQUAL:
+                        pass
+                    case _:
+                        raise SystemExit("Logic error")
+
+                if op.token_type == TokenType.EQUAL:
+                    # Simple assignment
+                    return expr.Assign(name=name, value=value)
+                else:
+                    return expr.Assign(
+                        name=name,
+                        value=expr.Binary(
+                            left=expr.Variable(name), operator=op, right=value
+                        ),
+                    )
 
             if self.error_reporter is not None:
                 self.error_reporter.report(
-                    "error", "Syntax Error: Invalid assignment", token=equal
+                    "error", "Syntax Error: Invalid assignment", token=operator
                 )
             else:
-                raise ParserException("Syntax Error: Invalid assignment", token=equal)
+                raise ParserException(
+                    "Syntax Error: Invalid assignment", token=operator
+                )
 
         return exp
 

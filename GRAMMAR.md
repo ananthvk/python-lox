@@ -25,7 +25,8 @@ print_statement      = "print" expression ";"
 expression_statement = expression ";"
 expression           = comma
 comma                = assignment ( "," assignment )*
-assignment           = IDENTIFIER "=" assignment | ternary
+assignment           = IDENTIFIER assignment_operator assignment | ternary
+asssignment_operator = "=" | "*=" | "+=" | "-=" | "/=" | "%="
 ternary              = logical_or | logical_or "?" expression ":" ternary
 logical_or           = logical_and ("or" logical_and)*
 logical_and          = equality ("and" equality)*

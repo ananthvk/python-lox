@@ -30,12 +30,15 @@ class TokenType(Enum):
     LESS = auto()
     LESS_EQUAL = auto()
     MINUS = auto()
+    MINUS_EQUAL = auto()
     NIL = auto()
     NOT = auto()
     NUMBER = auto()
     OR = auto()
     PERCENTAGE = auto()
+    PERCENTAGE_EQUAL = auto()
     PLUS = auto()
+    PLUS_EQUAL = auto()
     PRINT = auto()
     QUESTION_MARK = auto()
     RETURN = auto()
@@ -43,7 +46,9 @@ class TokenType(Enum):
     RIGHT_PAREN = auto()
     SEMICOLON = auto()
     SLASH = auto()
+    SLASH_EQUAL = auto()
     STAR = auto()
+    STAR_EQUAL = auto()
     STRING = auto()
     SUPER = auto()
     THIS = auto()
@@ -103,6 +108,11 @@ double_char_tokens = {
     ">=": TokenType.GREATER_EQUAL,
     "<=": TokenType.LESS_EQUAL,
     "==": TokenType.EQUAL_EQUAL,
+    "+=": TokenType.PLUS_EQUAL,
+    "-=": TokenType.MINUS_EQUAL,
+    "*=": TokenType.STAR_EQUAL,
+    "/=": TokenType.SLASH_EQUAL,
+    "%=": TokenType.PERCENTAGE_EQUAL,
 }
 
 misc = {

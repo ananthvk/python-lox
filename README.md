@@ -104,3 +104,18 @@ for var i = 0; i < 10; i = i + 1 {
     }
 }
 ```
+
+11) `assert` statement, prints `Assertion Error` and terminates the interpreter if it fails, useful for writing tests within the language
+```
+var x = 3;
+assert x == 3; // Passes
+assert x == 5; // Fails
+assert x == 5, "x is not equal to 5"; // Prints: Assertion Error: x is not equal to 5
+```
+
+12) Implemented augmented assignment operators `+=`, `-=`, `*=`, `/=`, `%=`
+```
+for var i = 0; i < 10; i+= 1 { 
+    print i;
+}
+```
