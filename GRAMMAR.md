@@ -34,7 +34,9 @@ equality             = comparison ( ("==" | "!=") comparison)*
 comparison           = term | ( (">" | ">=" | "<" | "<=") term)*
 term                 = factor | ( ("+" | "-") factor)*
 factor               = unary | ( ("*" | "/" | "%") unary)*
-unary                = (("!" | "-" | "not") unary) | primary
+unary                = (("!" | "-" | "not") unary) | call
+call                 = primary ( "(" arguments? ")")*
+arguments            = expression ("," expression)*
 primary              = "false" | "true" | "nil"
                       | NUMBER | STRING | "(" expression ")"
                       | IDENTIFIER

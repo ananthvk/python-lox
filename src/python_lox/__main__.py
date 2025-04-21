@@ -29,7 +29,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
                 token_line, start, _ = error_reporter.get_token_line(source, token)
                 if token_line:
                     squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
-                    extra_info = f'at "{token.string_repr}"\n    {token.line} | {token_line}\n{squiggles}'
+                    extra_info = f'\n    {token.line} | {token_line}\n{squiggles}'
 
             if message[0] == "error":
                 print(f"[red]{message[1]} {extra_info}[/red]")

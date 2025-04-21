@@ -1,6 +1,6 @@
 from .ast import expr as Expr
 from .ast import stmt as Stmt
-from .token import TokenType
+from .token import TokenType, Token
 from .error_reporter import ErrorReporter
 from .environment import Environment, NameException
 from typing import TextIO, override, TypeGuard, List
@@ -16,9 +16,12 @@ NOTES:
 
 
 class RuntimeException(Exception):
-    def __init__(self, message: str, exp: Expr.Expr | None = None) -> None:
+    def __init__(
+        self, message: str, exp: Expr.Expr | None = None, token: Token | None = None
+    ) -> None:
         super().__init__(message)
         self.exp = exp
+        self.token = token
 
 
 class BreakException(Exception):
@@ -56,7 +59,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 if self.is_numeric(right):
                     return -right
                 raise RuntimeException(
-                    'Syntax Error: Invalid unary operator "-" for type', expr
+                    'Syntax Error: Invalid unary operator "-" for type',
+                    token=expr.operator,
                 )
             case TokenType.BANG:
                 return not self.is_truthy(right)
@@ -95,7 +99,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         if not self.is_same_type(left, right):
             raise RuntimeException(
                 f"Runtime Error: Operator {expr.operator.string_repr} not supported between different types",
-                expr,
+                token=expr.operator,
             )
 
         match expr.operator.token_type:
@@ -103,13 +107,15 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 if self.is_numeric(left):
                     return left - right  # type: ignore
                 raise RuntimeException(
-                    'Type Error: Operator "-" not valid between the operands', expr
+                    'Type Error: Operator "-" not valid between the operands',
+                    token=expr.operator,
                 )
             case TokenType.STAR:
                 if self.is_numeric(left):
                     return left * right  # type: ignore
                 raise RuntimeException(
-                    'Type Error: Operator "*" not valid between the operands', expr
+                    'Type Error: Operator "*" not valid between the operands',
+                    token=expr.operator,
                 )
             case TokenType.SLASH:
                 if self.is_numeric(left):
@@ -118,11 +124,12 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                     except ZeroDivisionError:
                         raise RuntimeException(
                             "Runtime Error: Divide by Zero Error: division by zero",
-                            expr,
+                            token=expr.operator,
                         )
 
                 raise RuntimeException(
-                    'Type Error: Operator "/" not valid between the operands', expr
+                    'Type Error: Operator "/" not valid between the operands',
+                    token=expr.operator,
                 )
             case TokenType.PERCENTAGE:
                 return left % right  # type: ignore
@@ -139,7 +146,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             case _:
                 raise RuntimeException(
                     f'Syntax Error: Invalid operator "{expr.operator.string_repr}"',
-                    expr,
+                    token=expr.operator,
                 )
 
     @override
@@ -334,7 +341,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         except RuntimeException as e:
             if self.error_reporter is None:
                 raise e
-            self.error_reporter.report("error", f"{e}")
+            self.error_reporter.report("error", f"{e}", token=e.token)
 
         except NameException as e:
             if self.error_reporter is None:
