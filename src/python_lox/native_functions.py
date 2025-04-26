@@ -72,4 +72,64 @@ class Floor(Callable):
         return "<native function floor>"
 
 
-native_functions: List[Callable] = [Clock(), Input(), Len(), Floor()]
+class ParseInt(Callable):
+    def arity(self) -> int:
+        return 1
+
+    def call(self, interpreter: "Interpreter", args: List[object]) -> object:
+        try:
+            return int(args[0])  # type: ignore
+        except:
+            return None
+
+    def name(self) -> str:
+        return "parse_int"
+
+    def __str__(self) -> str:
+        return "<native function parse_int>"
+
+
+class ParseFloat(Callable):
+    def arity(self) -> int:
+        return 1
+
+    def call(self, interpreter: "Interpreter", args: List[object]) -> object:
+        try:
+            return float(args[0])  # type: ignore
+        except:
+            return None
+
+    def name(self) -> str:
+        return "parse_float"
+
+    def __str__(self) -> str:
+        return "<native function parse_float>"
+
+
+class ToString(Callable):
+    def arity(self) -> int:
+        return 1
+
+    def call(self, interpreter: "Interpreter", args: List[object]) -> object:
+        return interpreter.stringify(args[0])
+
+    def name(self) -> str:
+        return "to_string"
+
+    def __str__(self) -> str:
+        return "<native function to_string>"
+
+
+"""
+Note: ParseInt and ParseFloat works similar to C# try parse, these methods return null if parsing failed, instead of throwing
+exception
+"""
+native_functions: List[Callable] = [
+    Clock(),
+    Input(),
+    Len(),
+    Floor(),
+    ParseInt(),
+    ParseFloat(),
+    ToString(),
+]

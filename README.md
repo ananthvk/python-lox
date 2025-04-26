@@ -119,3 +119,22 @@ for var i = 0; i < 10; i+= 1 {
     print i;
 }
 ```
+
+13) Native functions - `clock()`, `input()`, `floor()` and `len()`, `parse_int()`, `parse_float()`, `to_string()`
+
+Note: ParseInt and ParseFloat works similar to C# try parse, these methods return null if parsing failed, instead of throwing
+exception
+
+```
+var start = clock();
+print start; // 1745673189.2214336
+
+var name = input();
+print "Hello, name";
+
+var value = floor(3.1415);
+print value; // 3
+
+print len("Program") // 7
+
+```
