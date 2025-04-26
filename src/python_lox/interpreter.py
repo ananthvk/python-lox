@@ -4,7 +4,8 @@ from .token import TokenType, Token
 from .callable import Callable
 from .error_reporter import ErrorReporter
 from .environment import Environment, NameException
-from typing import TextIO, override, TypeGuard, List
+from typing import TextIO, override, TypeGuard, List, Final
+from .native_functions import native_functions
 import sys
 
 """
@@ -41,7 +42,11 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         super().__init__()
         self.error_reporter = error_reporter
         self.stdout = stdout
-        self.environment = Environment()
+        self.globals: Final = Environment()
+        self.environment = self.globals
+
+        for function in native_functions:
+            self.globals.values[function.name()] = ("initialized", function)
 
     @override
     def visit_literal_expr(self, expr: Expr.Literal) -> object:
@@ -340,7 +345,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         if not isinstance(callee, Callable):
             raise RuntimeException(
                 f'Runtime Exception: Can only call functions and classes, but got "{type(callee).__name__}"',
-                token=expr.paren
+                token=expr.paren,
             )
         if len(args) != callee.arity():
             message = ""

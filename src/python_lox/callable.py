@@ -13,3 +13,7 @@ class Callable(ABC):
     @abstractmethod
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         pass
+
+    @abstractmethod
+    def name(self) -> str:
+        pass
