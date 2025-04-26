@@ -1,0 +1,16 @@
+print "Enter a number: ";
+const number = parse_int(input());
+
+if number == nil {
+    println "Please enter a valid number";
+} else {
+    var n = number;
+    var rev = 0;
+    while n != 0 {
+        var d = n % 10;
+        rev = rev * 10 + d;
+        n /= 10;
+        n = floor(n);
+    }
+    println "Reversed number: " + to_string(rev);
+}
