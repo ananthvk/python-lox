@@ -20,8 +20,8 @@ def test_variables():
                      x = x * x + 100;
                      y = y * y + 100;
 
-                     print x;
-                     print y;
+                     println x;
+                     println y;
                      
                      """
         )
@@ -52,7 +52,7 @@ def test_variables():
                   var x = 30;
                   y = 50;
                   var z = x + y;
-                  print z;
+                  println z;
             """
         )
         == "80\n"
@@ -65,7 +65,7 @@ def test_const():
             """
                     const x = 30;
                     const y = 100;
-                    print x * y;
+                    println x * y;
         """
         )
         == "3000\n"
@@ -86,7 +86,7 @@ def test_if_statement():
         interpret(
             """
                 if (true) {
-                    print "This is true.";
+                    println "This is true.";
                 }
             """
         )
@@ -97,7 +97,7 @@ def test_if_statement():
         interpret(
             """
                 if (false) {
-                    print "This will not print.";
+                    println "This will not println.";
                 }
             """
         )
@@ -109,7 +109,7 @@ def test_if_statement():
             """
                 var x = 10;
                 if (x > 5) {
-                    print "x is greater than 5.";
+                    println "x is greater than 5.";
                 }
             """
         )
@@ -121,7 +121,7 @@ def test_if_statement():
             """
                 var x = 3;
                 if (x > 5) {
-                    print "x is greater than 5.";
+                    println "x is greater than 5.";
                 }
             """
         )
@@ -135,9 +135,9 @@ def test_if_else_statement():
         interpret(
             """
                 if (true) {
-                    print "This is true.";
+                    println "This is true.";
                 } else {
-                    print "This is false.";
+                    println "This is false.";
                 }
             """
         )
@@ -148,13 +148,13 @@ def test_if_else_statement():
         interpret(
             """
                 if (false) {
-                    print "This will not print.";
+                    println "This will not println.";
                 } else {
-                    print "This will print.";
+                    println "This will println.";
                 }
             """
         )
-        == "This will print.\n"
+        == "This will println.\n"
     )
 
     assert (
@@ -162,9 +162,9 @@ def test_if_else_statement():
             """
                 var x = 10;
                 if (x > 5) {
-                    print "x is greater than 5.";
+                    println "x is greater than 5.";
                 } else {
-                    print "x is not greater than 5.";
+                    println "x is not greater than 5.";
                 }
             """
         )
@@ -176,9 +176,9 @@ def test_if_else_statement():
             """
                 var x = 3;
                 if (x > 5) {
-                    print "x is greater than 5.";
+                    println "x is greater than 5.";
                 } else {
-                    print "x is not greater than 5.";
+                    println "x is not greater than 5.";
                 }
             """
         )
@@ -193,9 +193,9 @@ def test_scopes():
                 var x = 10;
                 {
                     var x = 20;
-                    print x;
+                    println x;
                 }
-                print x;
+                println x;
             """
         )
         == "20\n10\n"
@@ -207,9 +207,9 @@ def test_scopes():
                 var x = 10;
                 {
                     var y = 20;
-                    print y;
+                    println y;
                 }
-                print x;
+                println x;
             """
         )
         == "20\n10\n"
@@ -221,7 +221,7 @@ def test_scopes():
                 {
                     var y = 20;
                 }
-                print y;
+                println y;
             """
         )
 
@@ -231,7 +231,7 @@ def test_logical_operators():
         interpret(
             """
                 if (true or false) {
-                    print "Logical OR works.";
+                    println "Logical OR works.";
                 }
             """
         )
@@ -242,9 +242,9 @@ def test_logical_operators():
         interpret(
             """
                 if (true and false) {
-                    print "This will not print.";
+                    println "This will not println.";
                 } else {
-                    print "Logical AND works.";
+                    println "Logical AND works.";
                 }
             """
         )
@@ -255,7 +255,7 @@ def test_logical_operators():
         interpret(
             """
                 if (!false) {
-                    print "Logical NOT works.";
+                    println "Logical NOT works.";
                 }
             """
         )
@@ -268,7 +268,7 @@ def test_typeof():
         interpret(
             """
                 var x = 10;
-                print typeof x;
+                println typeof x;
             """
         )
         == "number\n"
@@ -278,7 +278,7 @@ def test_typeof():
         interpret(
             """
                 var x = "Hello";
-                print typeof x;
+                println typeof x;
             """
         )
         == "str\n"
@@ -288,7 +288,7 @@ def test_typeof():
         interpret(
             """
                 var x = true;
-                print typeof x;
+                println typeof x;
             """
         )
         == "bool\n"
@@ -298,7 +298,7 @@ def test_typeof():
         interpret(
             """
                 var x = nil;
-                print typeof x;
+                println typeof x;
             """
         )
         == "nil\n"
@@ -310,9 +310,9 @@ def test_typeof():
                 var x = 10;
                 var y = "Hello";
                 var z = true;
-                print typeof x;
-                print typeof y;
-                print typeof z;
+                println typeof x;
+                println typeof y;
+                println typeof z;
             """
         )
         == "number\nstr\nbool\n"
@@ -339,7 +339,7 @@ def test_assert():
         interpret(
             """
                 assert 5 > 3;
-                print "Assertion passed.";
+                println "Assertion passed.";
             """
         )
         == "Assertion passed.\n"
@@ -358,7 +358,7 @@ def test_assert():
         interpret(
             """
                 assert 10 == 10, "10 should be equal to 10";
-                print "Assertion passed.";
+                println "Assertion passed.";
             """
         )
         == "Assertion passed.\n"
@@ -377,7 +377,7 @@ def test_assert():
         interpret(
             """
                 assert true and true;
-                print "Logical AND assertion passed.";
+                println "Logical AND assertion passed.";
             """
         )
         == "Logical AND assertion passed.\n"
@@ -388,7 +388,7 @@ def test_assert():
         interpret(
             """
                 assert true or false;
-                print "Logical OR assertion passed.";
+                println "Logical OR assertion passed.";
             """
         )
         == "Logical OR assertion passed.\n"
@@ -399,7 +399,7 @@ def test_assert():
         interpret(
             """
                 assert !false;
-                print "Logical NOT assertion passed.";
+                println "Logical NOT assertion passed.";
             """
         )
         == "Logical NOT assertion passed.\n"
@@ -412,7 +412,7 @@ def test_assert():
                 var x = 20;
                 var y = 20;
                 assert x == y;
-                print "Variable comparison assertion passed.";
+                println "Variable comparison assertion passed.";
             """
         )
         == "Variable comparison assertion passed.\n"
@@ -423,7 +423,7 @@ def test_assert():
         interpret(
             """
                 assert (5 + 5) == 10;
-                print "Arithmetic expression assertion passed.";
+                println "Arithmetic expression assertion passed.";
             """
         )
         == "Arithmetic expression assertion passed.\n"
@@ -436,7 +436,7 @@ def test_assert():
                 var x = 10;
                 var y = 20;
                 assert (x < y) and (y > x);
-                print "Combined condition assertion passed.";
+                println "Combined condition assertion passed.";
             """
         )
         == "Combined condition assertion passed.\n"

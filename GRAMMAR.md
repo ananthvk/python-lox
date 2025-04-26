@@ -4,6 +4,7 @@ variable_declaration = "var" IDENTIFER ( "=" expression )? ";"
 const_declaration    = "const" IDENTIFIER "=" expression ";"
 statement            = expression_statement
                       | print_statement
+                      | println_statement
                       | block
                       | if_statement
                       | while_statement
@@ -22,6 +23,7 @@ while_statement      = "while" expression block
 if_statement         = "if" expression block ("else" block)? 
 block                = "{" declaration* "}"
 print_statement      = "print" expression ";"
+println_statement      = "println" expression ";"
 expression_statement = expression ";"
 expression           = comma
 comma                = assignment ( "," assignment )*

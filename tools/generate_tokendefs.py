@@ -24,6 +24,7 @@ tokendefs = {
         "for": "FOR",
         "while": "WHILE",
         "print": "PRINT",
+        "println": "PRINTLN",
         "return": "RETURN",
         "super": "SUPER",
         "this": "THIS",

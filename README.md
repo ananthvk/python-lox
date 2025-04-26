@@ -138,3 +138,6 @@ print value; // 3
 print len("Program") // 7
 
 ```
+
+14) `print` and `println` statement
+

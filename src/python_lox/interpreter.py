@@ -1,4 +1,9 @@
-from .exceptions import BreakException, ContinueException, NameException, RuntimeException
+from .exceptions import (
+    BreakException,
+    ContinueException,
+    NameException,
+    RuntimeException,
+)
 from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .token import TokenType
@@ -210,6 +215,11 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_print_stmt(self, stmt: Stmt.Print) -> None:
+        result = self.evaluate(stmt.expression)
+        print(self.stringify(result), file=self.stdout, end="")
+
+    @override
+    def visit_println_stmt(self, stmt: Stmt.Println) -> None:
         result = self.evaluate(stmt.expression)
         print(self.stringify(result), file=self.stdout)
 

@@ -36,6 +36,7 @@ ast_classes: Dict[str, Any] = {
     "stmt": {
         "expression": [("expression", "Expr")],
         "print": [("expression", "Expr")],
+        "println": [("expression", "Expr")],
         "var": [("name", "Token"), ("initializer", "Expr | None = None")],
         "const": [("name", "Token"), ("initializer", "Expr")],
         "block": [("statements", "List[Stmt]")],

@@ -7,7 +7,7 @@ def test_while_loops():
             """
                 var x = 0;
                 while (x < 5) {
-                    print x;
+                    println x;
                     x = x + 1;
                 }
             """
@@ -20,7 +20,7 @@ def test_while_loops():
             """
                 var x = 10;
                 while (x > 5) {
-                    print x;
+                    println x;
                     x = x - 1;
                 }
             """
@@ -33,7 +33,7 @@ def test_while_loops():
             """
                 var x = 1;
                 while (x < 4) {
-                    print x * 2;
+                    println x * 2;
                     x = x + 1;
                 }
             """
@@ -50,7 +50,7 @@ def test_while_loops():
                     sum = sum + x;
                     x = x + 1;
                 }
-                print sum;
+                println sum;
             """
         )
         == "6\n"
@@ -65,7 +65,7 @@ def test_while_loops():
                     factorial = factorial * x;
                     x = x + 1;
                 }
-                print factorial;
+                println factorial;
             """
         )
         == "24\n"
@@ -76,7 +76,7 @@ def test_while_loops():
             """
                 var x = 0;
                 while (x < 3) {
-                    print "Hello";
+                    println "Hello";
                     x = x + 1;
                 }
             """
@@ -89,7 +89,7 @@ def test_while_loops():
             """
                 var x = 5;
                 while (x > 0) {
-                    print x * x;
+                    println x * x;
                     x = x - 1;
                 }
             """
@@ -104,7 +104,7 @@ def test_while_loops():
                 while (x < 2) {
                     var y = 0;
                     while (y < 2) {
-                        print x + y;
+                        println x + y;
                         y = y + 1;
                     }
                     x = x + 1;
@@ -121,7 +121,7 @@ def test_while_loops():
                 while (x % 3 != 0) {
                     x = x - 1;
                 }
-                print x;
+                println x;
             """
         )
         == "9\n"
@@ -135,7 +135,7 @@ def test_for_loop():
                 var x;
                 for x = 10; x % 3 != 0; x = x - 1 {
                 }
-                print x;
+                println x;
             """
         )
         == "9\n"
@@ -148,7 +148,7 @@ def test_for_loop():
                 for var x = 0; x <= 5; x = x + 1 {
                     sum = sum + x;
                 }
-                print sum;
+                println sum;
             """
         )
         == "15\n"
@@ -158,7 +158,7 @@ def test_for_loop():
         interpret(
             """
                 for var x = 0; x < 3; x = x + 1 {
-                    print "Hello";
+                    println "Hello";
                 }
             """
         )
@@ -169,7 +169,7 @@ def test_for_loop():
         interpret(
             """
                 for var x = 5; x > 0; x = x - 1 {
-                    print x * x;
+                    println x * x;
                 }
             """
         )
@@ -181,7 +181,7 @@ def test_for_loop():
             """
                 for var x = 0; x < 2; x = x + 1 {
                     for var y = 0; y < 2; y = y + 1 {
-                        print x + y;
+                        println x + y;
                     }
                 }
             """
@@ -196,7 +196,7 @@ def test_for_loop():
                 for var x = 1; x <= 4; x = x + 1 {
                     factorial = factorial * x;
                 }
-                print factorial;
+                println factorial;
             """
         )
         == "24\n"
@@ -209,7 +209,7 @@ def test_for_loop():
                 for var x = 1; x <= 3; x = x + 1 {
                     product = product * x;
                 }
-                print product;
+                println product;
             """
         )
         == "6\n"
@@ -220,7 +220,7 @@ def test_for_loop():
             """
                 for var x = 0; x < 5; x = x + 1 {
                     if (x % 2 == 0) {
-                        print x;
+                        println x;
                     }
                 }
             """
@@ -237,7 +237,7 @@ def test_for_loop():
                         sum = sum + x;
                     }
                 }
-                print sum;
+                println sum;
             """
         )
         == "9\n"
@@ -247,7 +247,7 @@ def test_for_loop():
         interpret(
             """
                 for var x = 10; x > 0; x = x - 2 {
-                    print x;
+                    println x;
                 }
             """
         )
@@ -263,7 +263,7 @@ def test_for_loop():
                         count = count + 1;
                     }
                 }
-                print count;
+                println count;
             """
         )
         == "4\n"
@@ -278,7 +278,7 @@ def test_continue_and_break():
                     if (x == 2) {
                         continue;
                     }
-                    print x;
+                    println x;
                 }
             """
         )
@@ -292,7 +292,7 @@ def test_continue_and_break():
                     if (x == 3) {
                         break;
                     }
-                    print x;
+                    println x;
                 }
             """
         )
@@ -308,7 +308,7 @@ def test_continue_and_break():
                     if (x % 2 == 0) {
                         continue;
                     }
-                    print x;
+                    println x;
                 }
             """
         )
@@ -323,7 +323,7 @@ def test_continue_and_break():
                     if (x == 3) {
                         break;
                     }
-                    print x;
+                    println x;
                     x = x + 1;
                 }
             """
@@ -338,7 +338,7 @@ def test_continue_and_break():
                     if (x % 3 == 0) {
                         continue;
                     }
-                    print x;
+                    println x;
                 }
             """
         )
@@ -355,7 +355,7 @@ def test_continue_and_break():
                     }
                     sum = sum + x;
                 }
-                print sum;
+                println sum;
             """
         )
         == "15\n"
@@ -371,7 +371,7 @@ def test_continue_and_break():
                     }
                     count = count + 1;
                 }
-                print count;
+                println count;
             """
         )
         == "5\n"
@@ -389,7 +389,7 @@ def test_continue_and_break():
                         x = x + 1;
                         continue;
                     }
-                    print x;
+                    println x;
                     x = x + 1;
                 }
             """
@@ -407,7 +407,7 @@ def test_continue_and_break():
                     if (x == 6) {
                         break;
                     }
-                    print x;
+                    println x;
                 }
             """
         )
@@ -429,7 +429,7 @@ def test_continue_and_break():
                     }
                     sum = sum + x;
                 }
-                print sum;
+                println sum;
             """
         )
         == "19\n"

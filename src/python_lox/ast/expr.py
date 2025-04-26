@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..token import Token
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
@@ -131,3 +131,4 @@ class Call(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_call_expr(self)
+

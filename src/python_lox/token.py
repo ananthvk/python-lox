@@ -40,6 +40,7 @@ class TokenType(Enum):
     PLUS = auto()
     PLUS_EQUAL = auto()
     PRINT = auto()
+    PRINTLN = auto()
     QUESTION_MARK = auto()
     RETURN = auto()
     RIGHT_BRACE = auto()
@@ -72,6 +73,7 @@ keywords = {
     "for": TokenType.FOR,
     "while": TokenType.WHILE,
     "print": TokenType.PRINT,
+    "println": TokenType.PRINTLN,
     "return": TokenType.RETURN,
     "super": TokenType.SUPER,
     "this": TokenType.THIS,

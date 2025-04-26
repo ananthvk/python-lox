@@ -370,6 +370,12 @@ class Parser:
         self.consume([TokenType.SEMICOLON], 'Expected ";" at end of print statement')
         return statement
 
+    def println_statement(self) -> stmt.Println:
+        expression = self.expression()
+        statement = stmt.Println(expression)
+        self.consume([TokenType.SEMICOLON], 'Expected ";" at end of println statement')
+        return statement
+
     def expression_statement(self) -> stmt.Expression:
         expression = self.expression()
         statement = stmt.Expression(expression)
@@ -497,14 +503,10 @@ class Parser:
         return stmt.Assert(exp, message_expression=message_expression)
 
     def statement(self) -> stmt.Stmt:
-        """
-        Parses a statement
-        statement -> print_statement | expression_statement
-        print_statement -> "print" expression ";"
-        expression_statement -> expression ";"
-        """
         if self.match([TokenType.PRINT]):
             return self.print_statement()
+        if self.match([TokenType.PRINTLN]):
+            return self.println_statement()
         if self.match([TokenType.LEFT_BRACE]):
             return self.block_statement()
         if self.match([TokenType.IF]):
