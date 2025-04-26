@@ -7,7 +7,7 @@ from .exceptions import (
 from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .token import TokenType
-from .callable import Callable
+from .callable import Callable, LoxFunction
 from .error_reporter import ErrorReporter
 from .environment import Environment
 from typing import TextIO, override, TypeGuard, List, Final
@@ -240,11 +240,16 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_block_stmt(self, stmt: Stmt.Block) -> None:
+        env = Environment(parent=self.environment)
+        self.execute_multiple_statements(stmt.statements, env)
+
+    def execute_multiple_statements(
+        self, stmts: List[Stmt.Stmt], env: Environment
+    ) -> None:
         previous_env = self.environment
         try:
-            self.environment = Environment()
-            self.environment.parent = previous_env
-            for statement in stmt.statements:
+            self.environment = env
+            for statement in stmts:
                 self.execute(statement=statement)
         finally:
             self.environment = previous_env
@@ -352,6 +357,11 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 token=expr.paren,
             )
         return callee.call(self, args)
+
+    @override
+    def visit_function_stmt(self, stmt: Stmt.Function) -> None:
+        function = LoxFunction(declaration=stmt)
+        self.environment.values[stmt.name.string_repr] = ("initialized", function)
 
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)

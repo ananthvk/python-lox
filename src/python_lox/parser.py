@@ -6,7 +6,7 @@ from .ast import expr
 from copy import copy
 from .error_reporter import ErrorReporter
 
-MAX_ARGUMENTS: Final = 5
+MAX_ARGUMENTS: Final = 255
 
 
 class Parser:
@@ -282,6 +282,41 @@ class Parser:
         self.consume([TokenType.RIGHT_PAREN], message='Expected ")" after arguments')
         return arguments
 
+    def function(self, kind: str) -> stmt.Function:
+        self.consume([TokenType.IDENTIFIER], f"Expected {kind} name")
+        name = self.previous()
+        self.consume([TokenType.LEFT_PAREN], f'Expected "(" after {kind} name')
+
+        parameters: List[Token] = []
+
+        if not self.check(TokenType.RIGHT_PAREN):
+            while True:
+                if len(parameters) >= MAX_ARGUMENTS:
+                    if self.error_reporter is not None:
+                        self.error_reporter.report(
+                            "error",
+                            f"Cannot have more than {MAX_ARGUMENTS} parameters",
+                            token=self.peek(),
+                        )
+                    else:
+                        raise ParserException(
+                            f"Cannot have more than ${MAX_ARGUMENTS} parameters",
+                            token=self.peek(),
+                        )
+                self.consume([TokenType.IDENTIFIER], "Expected parameter name")
+                parameter = self.previous()
+                parameters.append(parameter)
+                # If there are no more commas, break
+                if not self.match([TokenType.COMMA]):
+                    break
+        self.consume([TokenType.RIGHT_PAREN], message='Expected ")" after parameters')
+        self.consume(
+            [TokenType.LEFT_BRACE],
+            message='Expected "{" block after function declaration',
+        )
+        body = self.block_statement().statements
+        return stmt.Function(name=name, params=parameters, body=body)
+
     def primary(self) -> expr.Expr:
         if self.match([TokenType.IDENTIFIER]):
             return expr.Variable(name=self.previous())
@@ -501,6 +536,8 @@ class Parser:
         return stmt.Assert(exp, message_expression=message_expression)
 
     def statement(self) -> stmt.Stmt:
+        if self.match([TokenType.FUN]):
+            return self.function("function")
         if self.match([TokenType.PRINT]):
             return self.print_statement()
         if self.match([TokenType.PRINTLN]):

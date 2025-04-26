@@ -1,5 +1,11 @@
 program              = declaration* EOF
-declaration          = const_declaration | variable_declaration | statement
+declaration          = const_declaration 
+                      | variable_declaration 
+                      | function_declaration
+                      | statement
+function_declaration = "fun" function
+function             = IDENTIFIER "(" parameters? ")" block
+parameters           = IDENTIFER ( "," IDENTIFIER ) * 
 variable_declaration = "var" IDENTIFER ( "=" expression )? ";"
 const_declaration    = "const" IDENTIFIER "=" expression ";"
 statement            = expression_statement

@@ -25,7 +25,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
             if token is None:
                 extra_info = ""
             else:
-                token_line, start, _ = error_reporter.get_token_line(source, token)
+                token_line, start, _ = error_reporter.get_token_line(token)
                 if token_line:
                     squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
                     extra_info = f"\n    {token.line} | {token_line}\n{squiggles}"
@@ -79,7 +79,7 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
             break
         if line == "":
             continue
-        lox.run(line, repl=True)
+        lox.run(line, repl=False)
         report_error(error_reporter, line)
         error_reporter.is_error = False
         error_reporter.messages.clear()

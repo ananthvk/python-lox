@@ -58,6 +58,7 @@ class Lexer:
         token.line = self.line
         token.start = self.index
         token.end = self.current
+        token.src = self.source
         return token
 
     def find_string(self) -> Token:

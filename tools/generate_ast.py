@@ -58,6 +58,11 @@ ast_classes: Dict[str, Any] = {
             ("expression", "Expr"),
             ("message_expression", "Expr | None = None"),
         ],
+        "function": [
+            ("name", "Token"),
+            ("params", "List[Token]"),
+            ("body", "List[Stmt]")
+        ]
     },
 }
 

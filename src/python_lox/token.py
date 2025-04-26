@@ -134,7 +134,11 @@ class Token:
     string_repr: str = ""
     start: int = 0
     end: int = 0
-
+    # Also store a reference to the source code, since the source code changes
+    # when we are executing in the REPL. And if a function throws an error, it will
+    # reference it's source code
+    src: str = ""
+    
     def __repr__(self) -> str:
         if self.token_type == TokenType.IDENTIFIER:
             return f"<{self.token_type} {self.literal}>"
