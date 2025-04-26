@@ -1,0 +1,61 @@
+fun add(a, b) {
+    return a + b;
+}
+
+fun subtract(a, b) {
+    return a - b;
+}
+
+fun multiply(a, b) {
+    return a * b;
+}
+
+fun divide(a, b) {
+    return a / b;
+}
+
+// Returns a function for the requested operation
+fun get_operation(operator) {
+    if operator == "+" {
+        return add;
+    }
+    if operator == "-" {
+        return subtract;
+    }
+    if operator == "*" {
+        return multiply;
+    }
+    if operator == "/" {
+        return divide;
+    }
+    else {
+        return nil;
+    }
+}
+
+fun main() {
+    print "Enter first number: ";
+    const a = parse_int(input());
+
+    print "Enter second number: ";
+    const b = parse_int(input());
+
+    if a == nil or b == nil {
+        println "Please enter valid numbers";
+        return;
+    }
+    
+    print "Enter operator (+, -, *, /): ";
+    const operator = input();
+    const operation = get_operation(operator);
+
+    if operation == nil {
+        println "Please enter a valid operator (+, -, *, /)";
+        return;
+    }
+    
+    const result = operation(a, b);
+    println "Result: " + to_string(result);
+}
+
+main();
