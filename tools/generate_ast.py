@@ -27,11 +27,7 @@ ast_classes: Dict[str, Any] = {
             ("operator", "Token"),
             ("right", "Expr"),
         ],
-        "call": [
-            ("callee", "Expr"),
-            ("paren", "Token"),
-            ("args", "List[Expr]")
-        ]
+        "call": [("callee", "Expr"), ("paren", "Token"), ("args", "List[Expr]")],
     },
     "stmt": {
         "expression": [("expression", "Expr")],
@@ -61,8 +57,9 @@ ast_classes: Dict[str, Any] = {
         "function": [
             ("name", "Token"),
             ("params", "List[Token]"),
-            ("body", "List[Stmt]")
-        ]
+            ("body", "List[Stmt]"),
+        ],
+        "return": [("keyword", "Token"), ("value", "Expr | None = None")],
     },
 }
 

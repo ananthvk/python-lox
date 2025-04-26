@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING, Final, override
+
+from .exceptions import ReturnException
 from .ast import stmt
 from .environment import Environment
 
@@ -43,6 +45,8 @@ class LoxFunction(Callable):
             environment.declare(
                 self.declaration.params[i], val=args[i], initialize=True
             )
-
-        interpreter.execute_multiple_statements(self.declaration.body, environment)
+        try:
+            interpreter.execute_multiple_statements(self.declaration.body, environment)
+        except ReturnException as e:
+            return e.value
         return None

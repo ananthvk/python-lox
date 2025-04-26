@@ -1,0 +1,18 @@
+// Finds the sum of the first n natural numbers recursively
+fun recursive_sum(n) {
+    if n <= 1 {
+        return 1;
+    }
+    return n + recursive_sum(n-1);
+}
+
+assert recursive_sum(1) ==  1;
+assert recursive_sum(2) ==  3;
+assert recursive_sum(3) ==  6;
+assert recursive_sum(4) ==  10;
+assert recursive_sum(5) ==  15;
+assert recursive_sum(6) ==  21;
+assert recursive_sum(7) ==  28;
+assert recursive_sum(8) ==  36;
+assert recursive_sum(9) ==  45;
+assert recursive_sum(10) ==  55;

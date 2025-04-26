@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from ..token import Token
 from .expr import Expr
 
+
 T = TypeVar("T")
 
 
@@ -58,6 +59,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_function_stmt(self, stmt: "Function") -> T:
+        pass
+
+    @abstractmethod
+    def visit_return_stmt(self, stmt: "Return") -> T:
         pass
 
 
@@ -178,3 +183,12 @@ class Function(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_function_stmt(self)
+
+
+@dataclass
+class Return(Stmt):
+    keyword: Token
+    value: Expr | None = None
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_return_stmt(self)

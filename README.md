@@ -141,3 +141,22 @@ print len("Program") // 7
 
 14) `print` and `println` statement
 
+15) Functions are declared with keyword `fun` and cannot be redeclared like JS/Python, but they can be assigned to another variable
+```
+fun foo() {
+    // Do something here
+}
+
+// This will throw a runtime error, since foo is already declared
+fun foo() { 
+    // Something else
+}
+
+// But this is allowed
+const x = foo;
+var y = foo;
+
+// Valid
+y();
+x();
+```

@@ -317,6 +317,15 @@ class Parser:
         body = self.block_statement().statements
         return stmt.Function(name=name, params=parameters, body=body)
 
+    def return_statement(self) -> stmt.Return:
+        keyword = self.previous()
+        exp = None
+        if not self.check(TokenType.SEMICOLON):
+            exp = self.expression()
+
+        self.consume([TokenType.SEMICOLON], 'Expected ";" after return statement')
+        return stmt.Return(keyword=keyword, value=exp)
+
     def primary(self) -> expr.Expr:
         if self.match([TokenType.IDENTIFIER]):
             return expr.Variable(name=self.previous())
@@ -536,6 +545,8 @@ class Parser:
         return stmt.Assert(exp, message_expression=message_expression)
 
     def statement(self) -> stmt.Stmt:
+        if self.match([TokenType.RETURN]):
+            return self.return_statement()
         if self.match([TokenType.FUN]):
             return self.function("function")
         if self.match([TokenType.PRINT]):

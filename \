@@ -2,7 +2,6 @@ from .exceptions import (
     BreakException,
     ContinueException,
     NameException,
-    ReturnException,
     RuntimeException,
 )
 from .ast import expr as Expr
@@ -369,7 +368,6 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         value = None
         if stmt.value:
             value = self.evaluate(stmt.value)
-        raise ReturnException(value=value)
 
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)

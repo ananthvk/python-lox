@@ -34,6 +34,12 @@ class BreakException(Exception):
     pass
 
 
+class ReturnException(Exception):
+    def __init__(self, value: object | None = None) -> None:
+        super().__init__()
+        self.value = value
+
+
 class NameException(Exception):
     def __init__(self, message: str, token: Token) -> None:
         super().__init__(message)

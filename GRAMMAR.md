@@ -18,6 +18,8 @@ statement            = expression_statement
                       | break_statement
                       | continue_statement
                       | assert_statement
+                      | return_statement
+return_statement     = "return" expression? ";"
 assert_statement     = "assert" logical_or ("," expression)? ";"
 break_statement      = "break" ";"
 continue_statement   = "continue" ";"
