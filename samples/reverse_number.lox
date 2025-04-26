@@ -1,6 +1,9 @@
 print "Enter a number: ";
 const number = parse_int(input());
 
+// Note: Does not work for very large numbers due to floating point precision and floor
+// TODO: Fix this later
+
 if number == nil {
     println "Please enter a valid number";
 } else {

@@ -12,14 +12,14 @@ class Lox:
         self.error_reporter = error_reporter
         self.interpreter = Interpreter(error_reporter=error_reporter)
 
-    def run(self, source: str) -> int:
+    def run(self, source: str, repl: bool = False) -> int:
         """
         Execute the source program
         """
         lexer = Lexer(source, self.error_reporter)
         tokens = lexer.process()
         parser = Parser(tokens, self.error_reporter)
-        statements = parser.parse()
+        statements = parser.parse(repl)
         if statements is not None:
             self.interpreter.interpret(statements)
             return 0

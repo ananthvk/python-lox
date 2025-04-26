@@ -143,9 +143,7 @@ class Parser:
                     "error", "Invalid assignment", token=operator
                 )
             else:
-                raise ParserException(
-                    "Invalid assignment", token=operator
-                )
+                raise ParserException("Invalid assignment", token=operator)
 
         return exp
 
@@ -576,17 +574,34 @@ class Parser:
             return self.const_declaration()
         return self.statement()
 
-    def parse(self) -> List[stmt.Stmt] | None:
+    def parse(self, repl: bool = False) -> List[stmt.Stmt] | None:
         statements: List[stmt.Stmt] = []
+        # TODO: Fix double error message in REPL
 
         while not self.is_at_end():
+            prev_current = self.current
             try:
                 statements.append(self.declaration())
             except ParserException as e:
-                if self.error_reporter is None:
-                    raise e
-                self.error_reporter.report("error", f"{str(e)}", token=e.token)
-                self.synchronize()
+                if not repl:
+                    if self.error_reporter is None:
+                        raise e
+                    self.error_reporter.report("error", f"{str(e)}", token=e.token)
+                    self.synchronize()
+
+                # If we are running in REPL, also try to parse an expression
+                # Then make it into a println statement (desugaring)
+                self.current = prev_current
+                # Try parsing an expression
+                try:
+                    exp = self.expression()
+                    statement = stmt.Println(expression=exp)
+                    statements.append(statement)
+                except ParserException as e:
+                    if self.error_reporter is None:
+                        raise e
+                    self.error_reporter.report("error", f"{str(e)}", token=e.token)
+                    self.synchronize()
 
         if self.error_reporter and self.error_reporter.is_error:
             return None

@@ -7,7 +7,6 @@ from rich import print
 from .lox import Lox
 from .error_reporter import ErrorReporter
 from typing_extensions import Annotated
-import sys
 
 app = typer.Typer()
 
@@ -29,7 +28,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
                 token_line, start, _ = error_reporter.get_token_line(source, token)
                 if token_line:
                     squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
-                    extra_info = f'\n    {token.line} | {token_line}\n{squiggles}'
+                    extra_info = f"\n    {token.line} | {token_line}\n{squiggles}"
 
             if message[0] == "error":
                 print(f"[red]{message[1]} {extra_info}[/red]")
@@ -80,7 +79,7 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
             break
         if line == "":
             continue
-        lox.run(line)
+        lox.run(line, repl=True)
         report_error(error_reporter, line)
         error_reporter.is_error = False
         error_reporter.messages.clear()
