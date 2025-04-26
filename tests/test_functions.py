@@ -83,3 +83,38 @@ def test_function_shadowing():
         )
         == "hello, world\nhello, there\n"
     )
+
+
+def test_closures():
+    assert (
+        interpret(
+            """
+            fun makeCounter() {
+                var i = 0;
+                fun count() {
+                    i = i + 1;
+                    print i;
+                }
+
+                return count;
+            }
+
+            const counter1 = makeCounter();
+            counter1();
+            counter1();
+            counter1();
+            println "";
+
+            const counter2 = makeCounter();
+            counter2();
+            counter2();
+            counter2();
+            counter2();
+            println "";
+            
+            counter1();
+            counter2();
+            """
+        )
+        == "123\n1234\n45"
+    )

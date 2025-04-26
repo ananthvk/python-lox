@@ -24,8 +24,9 @@ class Callable(ABC):
 
 
 class LoxFunction(Callable):
-    def __init__(self, declaration: stmt.Function) -> None:
+    def __init__(self, declaration: stmt.Function, closure: Environment) -> None:
         self.declaration: Final[stmt.Function] = declaration
+        self.closure: Final[Environment] = closure
 
     @override
     def name(self) -> str:
@@ -40,7 +41,7 @@ class LoxFunction(Callable):
 
     @override
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
-        environment = Environment(parent=interpreter.globals)
+        environment = Environment(parent=self.closure)
         for i in range(len(args)):
             environment.declare(
                 self.declaration.params[i], val=args[i], initialize=True

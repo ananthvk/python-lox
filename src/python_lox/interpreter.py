@@ -361,7 +361,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_function_stmt(self, stmt: Stmt.Function) -> None:
-        function = LoxFunction(declaration=stmt)
+        function = LoxFunction(declaration=stmt, closure=self.environment)
         self.environment.declare(stmt.name, function, initialize=True)
 
     @override

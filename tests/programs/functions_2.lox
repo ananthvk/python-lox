@@ -1,0 +1,46 @@
+fun add(a, b) {
+    return a + b;
+}
+
+fun subtract(a, b) {
+    return a - b;
+}
+
+fun multiply(a, b) {
+    return a * b;
+}
+
+fun divide(a, b) {
+    return a / b;
+}
+
+// Returns a function for the requested operation
+fun get_operation(operator) {
+    if operator == "+" {
+        return add;
+    }
+    if operator == "-" {
+        return subtract;
+    }
+    if operator == "*" {
+        return multiply;
+    }
+    if operator == "/" {
+        return divide;
+    }
+    else {
+        return nil;
+    }
+}
+
+fun solve(a, b, operator) {
+    const operation = get_operation(operator);
+    assert operation != nil;
+    const result = operation(a, b);
+    return result;
+}
+
+assert solve(32, 10, "+") == 42;
+assert solve(32, 10, "-") == 22;
+assert solve(32, 10, "*") == 320;
+assert floor(solve(30, 10, "/")) == 3;
