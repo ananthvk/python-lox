@@ -36,7 +36,7 @@ term                 = factor | ( ("+" | "-") factor)*
 factor               = unary | ( ("*" | "/" | "%") unary)*
 unary                = (("!" | "-" | "not") unary) | call
 call                 = primary ( "(" arguments? ")")*
-arguments            = expression ("," expression)*
+arguments            = assignment ("," assignment)*
 primary              = "false" | "true" | "nil"
                       | NUMBER | STRING | "(" expression ")"
                       | IDENTIFIER

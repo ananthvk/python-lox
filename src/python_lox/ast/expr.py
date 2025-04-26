@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ..token import Token
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Visitor(ABC, Generic[T]):
@@ -38,6 +38,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_logical_expr(self, expr: "Logical") -> T:
+        pass
+
+    @abstractmethod
+    def visit_call_expr(self, expr: "Call") -> T:
         pass
 
 
@@ -118,3 +122,12 @@ class Logical(Expr):
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_logical_expr(self)
 
+
+@dataclass
+class Call(Expr):
+    callee: Expr
+    paren: Token
+    args: List[Expr]
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_call_expr(self)

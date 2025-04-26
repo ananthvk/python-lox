@@ -1,9 +1,11 @@
 from .token import Token, TokenType
 from .ast import stmt
-from typing import List
+from typing import List, Final
 from .ast import expr
 from copy import copy
 from .error_reporter import ErrorReporter
+
+MAX_ARGUMENTS: Final = 5
 
 
 class ParserException(Exception):
@@ -143,11 +145,11 @@ class Parser:
 
             if self.error_reporter is not None:
                 self.error_reporter.report(
-                    "error", "Syntax Error: Invalid assignment", token=operator
+                    "error", "Invalid assignment", token=operator
                 )
             else:
                 raise ParserException(
-                    "Syntax Error: Invalid assignment", token=operator
+                    "Invalid assignment", token=operator
                 )
 
         return exp
@@ -241,7 +243,51 @@ class Parser:
             right = self.unary()
             return expr.Unary(operator=operator, right=right)
 
-        return self.primary()
+        return self.call()
+
+    def call(self) -> expr.Expr:
+        # A function call can be chained if one call returns another function
+        # For example: foo()(3, 2)(5, 6) ...
+        exp = self.primary()
+
+        while True:
+            if self.match([TokenType.LEFT_PAREN]):
+                args = self.function_args()
+                paren = self.previous()
+                exp = expr.Call(callee=exp, paren=paren, args=args)
+            else:
+                break
+        return exp
+
+    def function_args(self) -> List[expr.Expr]:
+        # Parses function args, assumes that LEFT_PAREN "(" has already been consumed
+        # Returns a list of expressions, that denote the function arguments / parameters
+        arguments: List[expr.Expr] = []
+        if self.match([TokenType.RIGHT_PAREN]):
+            # There are no args
+            return arguments
+
+        while True:
+            if len(arguments) >= MAX_ARGUMENTS:
+                if self.error_reporter is not None:
+                    self.error_reporter.report(
+                        "error",
+                        f"Cannot have more than {MAX_ARGUMENTS} arguments",
+                        token=self.peek(),
+                    )
+                else:
+                    raise ParserException(
+                        f"Cannot have more than ${MAX_ARGUMENTS} arguments",
+                        token=self.peek(),
+                    )
+            argument = self.assign()
+            arguments.append(argument)
+            # If there are no more commas, break
+            if not self.match([TokenType.COMMA]):
+                break
+
+        self.consume([TokenType.RIGHT_PAREN], message='Expected ")" after arguments')
+        return arguments
 
     def primary(self) -> expr.Expr:
         if self.match([TokenType.IDENTIFIER]):

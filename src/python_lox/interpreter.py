@@ -1,6 +1,7 @@
 from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .token import TokenType, Token
+from .callable import Callable
 from .error_reporter import ErrorReporter
 from .environment import Environment, NameException
 from typing import TextIO, override, TypeGuard, List
@@ -329,6 +330,29 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 )
             else:
                 raise RuntimeException("Assertion Error: ", exp=stmt.expression)
+
+    @override
+    def visit_call_expr(self, expr: Expr.Call) -> object:
+        callee = self.evaluate(expr.callee)
+        args: List[object] = []
+        for arg in expr.args:
+            args.append(self.evaluate(arg))
+        if not isinstance(callee, Callable):
+            raise RuntimeException(
+                f'Runtime Exception: Can only call functions and classes, but got "{type(callee).__name__}"',
+                token=expr.paren
+            )
+        if len(args) != callee.arity():
+            message = ""
+            if len(args) < callee.arity():
+                message = "Too few arguments"
+            else:
+                message = "Too many arguments"
+            raise RuntimeException(
+                f"Runtime Exception: {message}. Expected {callee.arity()} arguments, got {len(args)} arguments",
+                token=expr.paren,
+            )
+        return callee.call(self, args)
 
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)

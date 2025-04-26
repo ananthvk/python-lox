@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from ..token import Token
 from .expr import Expr
 
-
 T = TypeVar("T")
 
 
