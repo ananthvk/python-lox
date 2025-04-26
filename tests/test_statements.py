@@ -1,6 +1,6 @@
 from .conftest import interpret
-from python_lox.environment import NameException
-from python_lox.interpreter import RuntimeException
+from python_lox.exceptions import NameException
+from python_lox.exceptions import RuntimeException
 import pytest
 
 

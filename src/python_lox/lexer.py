@@ -1,16 +1,9 @@
 from typing import List
+
+from .exceptions import LexerException
 from .token import Token, TokenType
 from .token import keywords, double_char_tokens, single_char_tokens
 from .error_reporter import ErrorReporter
-
-
-class LexerException(Exception):
-    def __init__(self, message: str, line_no: int, index: int, current: int) -> None:
-        super().__init__(message)
-        self.line_no = line_no
-        # Exception occured when lexing token from [index, current)
-        self.index = index
-        self.current = current
 
 
 class Lexer:
@@ -79,7 +72,10 @@ class Lexer:
         # We have reached end of file
         if self.current >= len(self.source):
             raise LexerException(
-                "Syntax Error: Unterminated string literal", self.line, self.index, self.current
+                "Syntax Error: Unterminated string literal",
+                self.line,
+                self.index,
+                self.current,
             )
 
         # Consume the closing string literal

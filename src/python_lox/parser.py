@@ -1,3 +1,4 @@
+from .exceptions import ParserException
 from .token import Token, TokenType
 from .ast import stmt
 from typing import List, Final
@@ -6,12 +7,6 @@ from copy import copy
 from .error_reporter import ErrorReporter
 
 MAX_ARGUMENTS: Final = 5
-
-
-class ParserException(Exception):
-    def __init__(self, message: str, token: Token) -> None:
-        super().__init__(message)
-        self.token = token
 
 
 class Parser:

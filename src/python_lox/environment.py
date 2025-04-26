@@ -1,13 +1,9 @@
 from typing import Dict, Tuple, Literal, Set
+
+from .exceptions import NameException
 from .token import Token
 
 EnvironmentValueType = Tuple[Literal["uninitialized", "initialized"], object]
-
-
-class NameException(Exception):
-    def __init__(self, message: str, token: Token) -> None:
-        super().__init__(message)
-        self.token = token
 
 
 class Environment:

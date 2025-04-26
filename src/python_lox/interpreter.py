@@ -1,9 +1,10 @@
+from .exceptions import BreakException, ContinueException, NameException, RuntimeException
 from .ast import expr as Expr
 from .ast import stmt as Stmt
-from .token import TokenType, Token
+from .token import TokenType
 from .callable import Callable
 from .error_reporter import ErrorReporter
-from .environment import Environment, NameException
+from .environment import Environment
 from typing import TextIO, override, TypeGuard, List, Final
 from .native_functions import native_functions
 import sys
@@ -15,23 +16,6 @@ NOTES:
 
 2) No automatic conversion of integer to string
 """
-
-
-class RuntimeException(Exception):
-    def __init__(
-        self, message: str, exp: Expr.Expr | None = None, token: Token | None = None
-    ) -> None:
-        super().__init__(message)
-        self.exp = exp
-        self.token = token
-
-
-class BreakException(Exception):
-    pass
-
-
-class ContinueException(Exception):
-    pass
 
 
 class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
