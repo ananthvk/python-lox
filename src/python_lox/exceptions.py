@@ -12,7 +12,7 @@ class LexerException(Exception):
     def __init__(self, message: str, line_no: int, index: int, current: int) -> None:
         super().__init__(message)
         self.line_no = line_no
-        # Exception occured when lexing token from [index, current)
+        # Exception occurred when lexing token from [index, current)
         self.index = index
         self.current = current
 

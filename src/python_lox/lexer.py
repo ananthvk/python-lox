@@ -204,7 +204,7 @@ class Lexer:
             if self.lookahead() == "+" or self.lookahead() == "-":
                 self.advance()
 
-            # There should be atleast one digit
+            # There should be at least one digit
             if not self.lookahead().isdigit():
                 raise LexerException(
                     "Syntax Error: Invalid numeric literal, no number following 'e'",

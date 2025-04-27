@@ -324,7 +324,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             if self.is_truthy(left):
                 return left
         else:
-            # For and operator, if left is false, return it and do not evaulate the rest
+            # For and operator, if left is false, return it and do not evaluate the rest
             if not self.is_truthy(left):
                 return left
         return self.evaluate(expr.right)

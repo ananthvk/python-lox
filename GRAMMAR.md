@@ -5,8 +5,8 @@ declaration          = const_declaration
                       | statement
 function_declaration = "fun" function
 function             = IDENTIFIER "(" parameters? ")" block
-parameters           = IDENTIFER ( "," IDENTIFIER ) * 
-variable_declaration = "var" IDENTIFER ( "=" expression )? ";"
+parameters           = IDENTIFIER ( "," IDENTIFIER ) * 
+variable_declaration = "var" IDENTIFIER ( "=" expression )? ";"
 const_declaration    = "const" IDENTIFIER "=" expression ";"
 statement            = expression_statement
                       | print_statement

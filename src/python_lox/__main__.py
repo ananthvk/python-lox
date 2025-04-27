@@ -39,7 +39,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
                 print(f"[yellow]{message[1]} {extra_info}[/yellow]")
 
         if error_reporter.too_many_errors():
-            print("[yellow] Too many errors. Further errors supressed [/yellow]")
+            print("[yellow] Too many errors. Further errors suppressed [/yellow]")
 
 
 @app.command("")

@@ -25,6 +25,7 @@ dev = [
     "mypy>=1.15.0",
     "black>=25.1.0",
     "ruff>=0.11.7",
+    "codespell>=2.4.1",
 ]
 
 [tool.pytest.ini_options]
@@ -45,6 +46,7 @@ format = { composite = [
     "black .",
 ] }
 test = "pytest"
+codespell = "codespell"
 check = { composite = [
     "pdm run format",
     "pdm run typecheck",
