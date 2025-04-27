@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, TYPE_CHECKING, Final, override
 
 from .exceptions import ReturnException
-from .ast import stmt
+from .ast import stmt, expr
 from .environment import Environment
 
 if TYPE_CHECKING:
@@ -31,6 +31,36 @@ class LoxFunction(Callable):
     @override
     def name(self) -> str:
         return self.declaration.name.string_repr
+
+    def __str__(self) -> str:
+        return f"<function {self.name()}>"
+
+    @override
+    def arity(self) -> int:
+        return len(self.declaration.params)
+
+    @override
+    def call(self, interpreter: "Interpreter", args: List[object]) -> object:
+        environment = Environment(parent=self.closure)
+        for i in range(len(args)):
+            environment.declare(
+                self.declaration.params[i], val=args[i], initialize=True
+            )
+        try:
+            interpreter.execute_multiple_statements(self.declaration.body, environment)
+        except ReturnException as e:
+            return e.value
+        return None
+
+
+class ArrowFunction(Callable):
+    def __init__(self, declaration: expr.Arrow, closure: Environment) -> None:
+        self.declaration: Final[expr.Arrow] = declaration
+        self.closure: Final[Environment] = closure
+
+    @override
+    def name(self) -> str:
+        return "<arrow function>"
 
     def __str__(self) -> str:
         return f"<function {self.name()}>"

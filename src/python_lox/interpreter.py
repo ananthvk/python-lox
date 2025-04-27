@@ -8,7 +8,7 @@ from .exceptions import (
 from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .token import TokenType
-from .callable import Callable, LoxFunction
+from .callable import ArrowFunction, Callable, LoxFunction
 from .error_reporter import ErrorReporter
 from .environment import Environment
 from typing import TextIO, override, TypeGuard, List, Final
@@ -69,8 +69,12 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                     return "number"
                 if isinstance(right, str):
                     return "str"
+                if isinstance(right, LoxFunction) or isinstance(right, ArrowFunction):
+                    return "function"
                 if right is None:
                     return "nil"
+                else:
+                    raise RuntimeError("Cannot find type of given object")
             case _:
                 raise AssertionError("Logic error: Invalid unary operator")
         return None
@@ -363,6 +367,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def visit_function_stmt(self, stmt: Stmt.Function) -> None:
         function = LoxFunction(declaration=stmt, closure=self.environment)
         self.environment.declare(stmt.name, function, initialize=True)
+
+    @override
+    def visit_arrow_expr(self, expr: Expr.Arrow) -> object:
+        return ArrowFunction(declaration=expr, closure=self.environment)
 
     @override
     def visit_return_stmt(self, stmt: Stmt.Return) -> None:

@@ -160,3 +160,18 @@ var y = foo;
 y();
 x();
 ```
+
+16) Supports arrow functions (anonymous functions). In this implementation, they have a similar syntax to arrow functions of JS. Arrow functions support both a block body (multiple statements), or a single expression without braces.
+```
+const greet = (name) => "hello, " + name;
+println greet("world");
+
+const calculate_area = (l, b) => { 
+    var area = l * b;
+    println "Area: " + to_string(area);
+    return area;
+};
+var z = calculate_area(50);
+println z;
+
+```

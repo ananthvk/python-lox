@@ -1,10 +1,13 @@
-from typing import Generic, TypeVar, List
+from typing import Generic, TypeVar, List, TYPE_CHECKING
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from ..token import Token
 
+if TYPE_CHECKING:
+    from .stmt import Stmt
 
-T = TypeVar('T')
+
+T = TypeVar("T")
 
 
 class Visitor(ABC, Generic[T]):
@@ -42,6 +45,10 @@ class Visitor(ABC, Generic[T]):
 
     @abstractmethod
     def visit_call_expr(self, expr: "Call") -> T:
+        pass
+
+    @abstractmethod
+    def visit_arrow_expr(self, expr: "Arrow") -> T:
         pass
 
 
@@ -132,3 +139,11 @@ class Call(Expr):
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_call_expr(self)
 
+
+@dataclass
+class Arrow(Expr):
+    params: List[Token]
+    body: List["Stmt"]
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_arrow_expr(self)

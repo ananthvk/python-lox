@@ -18,7 +18,7 @@ class Parser:
         self.loop_depth = 0
 
         # Next token to be processed
-        self.current = 0
+        self.current: int = 0
 
     def match(self, token_types: List[TokenType]) -> bool:
         """
@@ -282,17 +282,13 @@ class Parser:
         self.consume([TokenType.RIGHT_PAREN], message='Expected ")" after arguments')
         return arguments
 
-    def function(self, kind: str) -> stmt.Function:
-        self.consume([TokenType.IDENTIFIER], f"Expected {kind} name")
-        name = self.previous()
-        self.consume([TokenType.LEFT_PAREN], f'Expected "(" after {kind} name')
-
+    def parameters(self, no_errors: bool = False) -> List[Token]:
         parameters: List[Token] = []
 
         if not self.check(TokenType.RIGHT_PAREN):
             while True:
                 if len(parameters) >= MAX_ARGUMENTS:
-                    if self.error_reporter is not None:
+                    if self.error_reporter is not None and (not no_errors):
                         self.error_reporter.report(
                             "error",
                             f"Cannot have more than {MAX_ARGUMENTS} parameters",
@@ -310,9 +306,19 @@ class Parser:
                 if not self.match([TokenType.COMMA]):
                     break
         self.consume([TokenType.RIGHT_PAREN], message='Expected ")" after parameters')
+        return parameters
+
+    def function(self, kind: str, no_errors: bool = False) -> stmt.Function:
+        """
+        If no_errors is set to True, does not use error_reporter to report messages
+        """
+        self.consume([TokenType.IDENTIFIER], f"Expected {kind} name")
+        name = self.previous()
+        self.consume([TokenType.LEFT_PAREN], f'Expected "(" after {kind} name')
+        parameters = self.parameters(no_errors=no_errors)
         self.consume(
             [TokenType.LEFT_BRACE],
-            message='Expected "{" block after function declaration',
+            message=f'Expected "{{" block after {kind} declaration',
         )
         body = self.block_statement().statements
         return stmt.Function(name=name, params=parameters, body=body)
@@ -343,12 +349,17 @@ class Parser:
             return expr.Literal(value=self.previous().literal)
 
         if self.match([TokenType.LEFT_PAREN]):
-            exp = self.expression()
-            # If right parenthesis is not found, it's an error
-            self.consume(
-                [TokenType.RIGHT_PAREN], "Could not find closing ')' after expression"
-            )
-            return expr.Grouping(exp)
+            # It can either be an arrow function, or a grouping
+            fxn = self.arrow_function()
+            if fxn is None:
+                exp = self.expression()
+                # If right parenthesis is not found, it's an error
+                self.consume(
+                    [TokenType.RIGHT_PAREN],
+                    "Could not find closing ')' after expression",
+                )
+                return expr.Grouping(exp)
+            return fxn
 
         # Add error productions here to handle missing left hand operands
 
@@ -380,6 +391,32 @@ class Parser:
             raise ParserException("Left hand operand missing", token=err_token)
 
         raise ParserException("Expected expression", token=self.previous())
+
+    def arrow_function(self) -> None | expr.Arrow:
+        prev_current: int = self.current
+        params = None
+        # TODO: Also reset error reporter
+
+        try:
+            params = self.parameters(no_errors=True)
+        except ParserException:
+            self.current = prev_current
+            return None
+
+        if not self.match([TokenType.ARROW]):
+            self.current = prev_current
+            return None
+
+        # Parse a block after an arrow function
+        if self.check(TokenType.LEFT_BRACE):
+            self.match([TokenType.LEFT_BRACE])
+            return expr.Arrow(body=self.block_statement().statements, params=params)
+
+        else:
+            # Parse an expression after an arrow function
+            exp = self.expression()
+            body: List[stmt.Stmt] = [stmt.Return(keyword=self.previous(), value=exp)]
+            return expr.Arrow(body=body, params=params)
 
     def synchronize(self) -> None:
         """
@@ -624,8 +661,6 @@ class Parser:
 
     def parse(self, repl: bool = False) -> List[stmt.Stmt] | None:
         statements: List[stmt.Stmt] = []
-        # TODO: Fix double error message in REPL
-
         while not self.is_at_end():
             prev_current = self.current
             try:
@@ -636,20 +671,20 @@ class Parser:
                         raise e
                     self.error_reporter.report("error", f"{str(e)}", token=e.token)
                     self.synchronize()
-
-                # If we are running in REPL, also try to parse an expression
-                # Then make it into a println statement (desugaring)
-                self.current = prev_current
-                # Try parsing an expression
-                try:
-                    exp = self.expression()
-                    statement = stmt.Println(expression=exp)
-                    statements.append(statement)
-                except ParserException as e:
-                    if self.error_reporter is None:
-                        raise e
-                    self.error_reporter.report("error", f"{str(e)}", token=e.token)
-                    self.synchronize()
+                else:
+                    # If we are running in REPL, also try to parse an expression
+                    # Then make it into a println statement (desugaring)
+                    self.current = prev_current
+                    # Try parsing an expression
+                    try:
+                        exp = self.expression()
+                        statement = stmt.Println(expression=exp)
+                        statements.append(statement)
+                    except ParserException as e:
+                        if self.error_reporter is None:
+                            raise e
+                        self.error_reporter.report("error", f"{str(e)}", token=e.token)
+                        self.synchronize()
 
         if self.error_reporter and self.error_reporter.is_error:
             return None

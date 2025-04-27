@@ -1,0 +1,15 @@
+var f = (a) => (b) => (c) => { return a + b + c; };
+assert f(1)(2)(3) == 6;
+
+assert ((a) => { return a * 2; } )(5) == 10;
+
+var double = (x) => x * 2;
+assert double(10) == 20;
+assert double(3) == 6;
+
+var foo = () => { return "hi"; };
+assert foo() == "hi";
+
+assert ((x) => (y) => (z) => x + y + z )(1)(2)(3) == 6; 
+
+

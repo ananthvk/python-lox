@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 class TokenType(Enum):
     AND = auto()
+    ARROW = auto()
     ASSERT = auto()
     BANG = auto()
     BANG_EQUAL = auto()
@@ -115,6 +116,7 @@ double_char_tokens = {
     "*=": TokenType.STAR_EQUAL,
     "/=": TokenType.SLASH_EQUAL,
     "%=": TokenType.PERCENTAGE_EQUAL,
+    "=>": TokenType.ARROW,
 }
 
 misc = {
@@ -138,7 +140,7 @@ class Token:
     # when we are executing in the REPL. And if a function throws an error, it will
     # reference it's source code
     src: str = ""
-    
+
     def __repr__(self) -> str:
         if self.token_type == TokenType.IDENTIFIER:
             return f"<{self.token_type} {self.literal}>"

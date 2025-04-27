@@ -50,3 +50,5 @@ arguments            = assignment ("," assignment)*
 primary              = "false" | "true" | "nil"
                       | NUMBER | STRING | "(" expression ")"
                       | IDENTIFIER
+                      | arrow_function
+arrow_function   = "(" parameters? ")" "=>" (block | expression)
