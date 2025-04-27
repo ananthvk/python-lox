@@ -105,5 +105,5 @@ visualizer.visualize(exp)
 
 print("digraph G {")
 for statement in statements:
-    print(f'    {statement}')
+    print(f"    {statement}")
 print("}")

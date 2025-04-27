@@ -1,6 +1,6 @@
-
 from enum import Enum, auto
 from dataclasses import dataclass
+
 
 class TokenType(Enum):
     AND = auto()
@@ -59,6 +59,7 @@ class TokenType(Enum):
     UNKNOWN = auto()
     VAR = auto()
     WHILE = auto()
+
 
 keywords = {
     "and": TokenType.AND,
@@ -128,6 +129,7 @@ misc = {
     "slash": TokenType.SLASH,
 }
 
+
 @dataclass
 class Token:
     token_type: TokenType = TokenType.UNKNOWN
@@ -147,9 +149,7 @@ class Token:
         elif self.token_type == TokenType.STRING:
             return f'<{self.token_type} "{self.literal}">'
         elif self.token_type == TokenType.NUMBER:
-            if (
-                isinstance(self.literal, float) or isinstance(self.literal, int)
-            ):
+            if isinstance(self.literal, float) or isinstance(self.literal, int):
                 return f"<{self.token_type} {self.literal}>"
 
         return f"<{self.token_type}>"

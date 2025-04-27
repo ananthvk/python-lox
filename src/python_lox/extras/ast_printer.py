@@ -55,7 +55,7 @@ class ASTPrinter(Expr.Visitor[str]):
     @override
     def visit_call_expr(self, expr: Expr.Call) -> str:
         return self.parenthesize("function", expr.callee, *expr.args)
-    
+
     @override
     def visit_arrow_expr(self, expr: Expr.Arrow) -> str:
         return self.parenthesize("=> function")

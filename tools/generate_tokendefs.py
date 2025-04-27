@@ -64,7 +64,7 @@ tokendefs = {
         "*=": "STAR_EQUAL",
         "/=": "SLASH_EQUAL",
         "%=": "PERCENTAGE_EQUAL",
-        "=>": "ARROW"
+        "=>": "ARROW",
     },
     "misc": {
         "identifier": "IDENTIFIER",
