@@ -1,0 +1,29 @@
+========== program.lox ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 0.00041604042053222656 seconds
+
+========== program.py ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 1.1682510375976562e-05 seconds
+
+========== program.cpp (No optimization) ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 2.24e-07 seconds
+
+========== program.cpp (-O1) ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 9.2e-08 seconds
+
+========== program.cpp (-O2) ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 1.36e-07 seconds
+
+========== program.cpp (-O3) ========== 
+Enter n: 30
+fib(30) is 832040
+Time taken: 8.6e-08 seconds

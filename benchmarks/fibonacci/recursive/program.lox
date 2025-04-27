@@ -1,0 +1,15 @@
+fun fib(n) {
+    if n <= 1 {
+        return n;
+    }
+    return fib(n - 2) + fib(n - 1);
+}
+
+print "Enter n: ";
+const n = parse_int(input());
+const start = clock();
+const f = fib(n);
+const end = clock();
+
+println "fib(" + to_string(n) + ") is " + to_string(f);
+println "Time taken: " + to_string(end - start) + " seconds";

@@ -1,0 +1,19 @@
+fun fib(n) {
+    var a = 0;
+    var b = 1;
+    for var i = 2; i <= n; i = i + 1 {
+        var temp = a + b;
+        a = b;
+        b = temp;
+    }
+    return b;
+}
+
+print "Enter n: ";
+const n = parse_int(input());
+const start = clock();
+const f = fib(n);
+const end = clock();
+
+println "fib(" + to_string(n) + ") is " + to_string(f);
+println "Time taken: " + to_string(end - start) + " seconds";

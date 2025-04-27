@@ -177,3 +177,4 @@ yarn.lock
 __pypackages__/
 .pdm-python
 .vscode/
+**/a.out
