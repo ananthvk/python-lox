@@ -1,10 +1,10 @@
+from copy import copy
+from typing import Final, List
+
+from .ast import expr, stmt
+from .error_reporter import ErrorReporter
 from .exceptions import ParserException
 from .token import Token, TokenType
-from .ast import stmt
-from typing import List, Final
-from .ast import expr
-from copy import copy
-from .error_reporter import ErrorReporter
 
 MAX_ARGUMENTS: Final = 255
 
@@ -507,7 +507,6 @@ class Parser:
             self.loop_depth -= 1
 
     def for_statement(self) -> stmt.For:
-
         # For loop is of the form for initializer ; condition; update {}
 
         # Parse the initializer, here we only restrict to

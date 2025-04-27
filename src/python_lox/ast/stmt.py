@@ -1,9 +1,9 @@
-from typing import Generic, TypeVar, List
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Generic, List, TypeVar
+
 from ..token import Token
 from .expr import Expr
-
 
 T = TypeVar("T")
 
@@ -154,14 +154,12 @@ class For(Stmt):
 
 @dataclass
 class Break(Stmt):
-
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_break_stmt(self)
 
 
 @dataclass
 class Continue(Stmt):
-
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_continue_stmt(self)
 

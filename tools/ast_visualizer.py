@@ -1,7 +1,8 @@
+from typing import List, override
+
 from python_lox.ast import expr as Expr
 from python_lox.lexer import Lexer
 from python_lox.parser import Parser
-from typing import List, override
 
 """
 Use graphviz to visualize the AST
@@ -17,7 +18,6 @@ statements: List[str] = []
 
 
 class ASTExpressionVisualizer(Expr.Visitor[int]):
-
     def __init__(self) -> None:
         super().__init__()
         self.counter = 0

@@ -1,7 +1,7 @@
-from python_lox.lexer import Lexer
 from python_lox.extras import astprint
-from python_lox.token import TokenType
+from python_lox.lexer import Lexer
 from python_lox.parser import Parser
+from python_lox.token import TokenType
 
 
 def test_basic_operations():
@@ -10,14 +10,14 @@ def test_basic_operations():
 
     assert parser.peek().token_type == TokenType.NUMBER
     assert parser.peek().literal == 3
-    assert parser.is_at_end() == False
+    assert not parser.is_at_end()
 
     token = parser.advance()
     assert token.literal == 3
     assert token.token_type == TokenType.NUMBER
 
     assert parser.peek().token_type == TokenType.PLUS
-    assert parser.is_at_end() == False
+    assert not parser.is_at_end()
 
     assert not parser.match([TokenType.STAR, TokenType.MINUS, TokenType.BANG])
     assert parser.match([TokenType.SLASH, TokenType.MINUS, TokenType.PLUS])
@@ -27,7 +27,7 @@ def test_basic_operations():
 
     assert parser.peek().token_type == TokenType.NUMBER
     assert parser.peek().literal == 5
-    assert parser.is_at_end() == False
+    assert not parser.is_at_end()
 
     token = parser.advance()
     assert token.literal == 5

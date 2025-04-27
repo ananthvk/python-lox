@@ -1,7 +1,8 @@
-from .conftest import interpret
-from python_lox.exceptions import NameException
-from python_lox.exceptions import RuntimeException
 import pytest
+
+from python_lox.exceptions import NameException, RuntimeException
+
+from .conftest import interpret
 
 
 def test_variables():

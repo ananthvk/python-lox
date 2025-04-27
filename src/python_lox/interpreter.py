@@ -1,3 +1,11 @@
+import sys
+from typing import Final, List, TextIO, TypeGuard, override
+
+from .ast import expr as Expr
+from .ast import stmt as Stmt
+from .callable import ArrowFunction, Callable, LoxFunction
+from .environment import Environment
+from .error_reporter import ErrorReporter
 from .exceptions import (
     BreakException,
     ContinueException,
@@ -5,15 +13,8 @@ from .exceptions import (
     ReturnException,
     RuntimeException,
 )
-from .ast import expr as Expr
-from .ast import stmt as Stmt
-from .token import TokenType
-from .callable import ArrowFunction, Callable, LoxFunction
-from .error_reporter import ErrorReporter
-from .environment import Environment
-from typing import TextIO, override, TypeGuard, List, Final
 from .native_functions import native_functions
-import sys
+from .token import TokenType
 
 """
 NOTES:
@@ -25,7 +26,6 @@ NOTES:
 
 
 class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
-
     def __init__(
         self, error_reporter: ErrorReporter | None = None, stdout: TextIO = sys.stdout
     ) -> None:
@@ -175,9 +175,9 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def is_equal(self, obj1: object, obj2: object) -> bool:
         if obj1 is None and obj2 is None:
             return True
-        if obj1 == None:
+        if obj1 is None:
             return False
-        if obj2 == None:
+        if obj2 is None:
             return False
 
         # Similar to python, return False if the type of objects are different
@@ -195,7 +195,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         # Treat int and float as numeric, just the internal representation is different
         if self.is_numeric(obj1) and self.is_numeric(obj2):
             return True
-        return type(obj1) == type(obj2)
+        return type(obj1) is type(obj2)
 
     def is_numeric(self, obj: object) -> TypeGuard[float | int]:
         return isinstance(obj, int) or isinstance(obj, float)

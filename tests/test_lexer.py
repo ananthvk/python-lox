@@ -40,7 +40,7 @@ def test_operators_with_multiple_characters_single():
     tokens = lexer.process()
     assert len(tokens) == 2
     assert tokens[0].token_type == TokenType.GREATER_EQUAL
-    assert tokens[0].literal == None
+    assert tokens[0].literal is None
     assert tokens[0].string_repr == ">="
 
 
@@ -50,31 +50,31 @@ def test_operators_with_multiple_characters_multiple():
     assert len(tokens) == 8
 
     assert tokens[0].token_type == TokenType.GREATER_EQUAL
-    assert tokens[0].literal == None
+    assert tokens[0].literal is None
     assert tokens[0].string_repr == ">="
 
     assert tokens[1].token_type == TokenType.LESS_EQUAL
-    assert tokens[1].literal == None
+    assert tokens[1].literal is None
     assert tokens[1].string_repr == "<="
 
     assert tokens[2].token_type == TokenType.EQUAL_EQUAL
-    assert tokens[2].literal == None
+    assert tokens[2].literal is None
     assert tokens[2].string_repr == "=="
 
     assert tokens[3].token_type == TokenType.BANG_EQUAL
-    assert tokens[3].literal == None
+    assert tokens[3].literal is None
     assert tokens[3].string_repr == "!="
 
     assert tokens[4].token_type == TokenType.GREATER
-    assert tokens[4].literal == None
+    assert tokens[4].literal is None
     assert tokens[4].string_repr == ">"
 
     assert tokens[5].token_type == TokenType.LESS
-    assert tokens[5].literal == None
+    assert tokens[5].literal is None
     assert tokens[5].string_repr == "<"
 
     assert tokens[6].token_type == TokenType.BANG
-    assert tokens[6].literal == None
+    assert tokens[6].literal is None
     assert tokens[6].string_repr == "!"
 
     assert tokens[7].token_type == TokenType.EOF

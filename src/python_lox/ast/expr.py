@@ -1,6 +1,7 @@
-from typing import Generic, TypeVar, List, TYPE_CHECKING
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Generic, List, TypeVar
+
 from ..token import Token
 
 if TYPE_CHECKING:

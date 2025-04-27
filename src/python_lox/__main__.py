@@ -1,18 +1,19 @@
-import typer
+import atexit
 import os
 import readline
 import sys
-from rich import print
 
-from .lox import Lox
-from .error_reporter import ErrorReporter
+import typer
+from rich import print
 from typing_extensions import Annotated
+
+from .error_reporter import ErrorReporter
+from .lox import Lox
 
 app = typer.Typer()
 
 HISTORY_FILE = os.path.expanduser("~/.loxhistory")
 
-import atexit
 
 atexit.register(lambda: readline.write_history_file(HISTORY_FILE))
 
@@ -27,7 +28,7 @@ def report_error(error_reporter: ErrorReporter, source: str) -> None:
             else:
                 token_line, start, _ = error_reporter.get_token_line(token)
                 if token_line:
-                    squiggles = f'    {" " * len(str(token.line))}  {" " * (token.start - start)} {"^" * len(token.string_repr)}'
+                    squiggles = f"    {' ' * len(str(token.line))}  {' ' * (token.start - start)} {'^' * len(token.string_repr)}"
                     extra_info = f"\n    {token.line} | {token_line}\n{squiggles}"
 
             if message[0] == "error":
@@ -70,10 +71,10 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
     print(
         f"[bold]Pylox[/bold] {lox.version} ({lox.build_date}) [Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}] on {sys.platform}"
     )
-    print(f'Type [bold]"exit"[/bold] to exit the interpeter')
+    print('Type [bold]"exit"[/bold] to exit the interpeter')
 
     while True:
-        print(f"[blue]>>> ", end="")
+        print("[blue]>>> ", end="")
         line = input()
         if line == "exit":
             break

@@ -1,7 +1,8 @@
-from .conftest import exec_command
-from typing import List
-import os
 import glob
+import os
+from typing import List
+
+from .conftest import exec_command
 
 
 def get_lox_files() -> List[str]:

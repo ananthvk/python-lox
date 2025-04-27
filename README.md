@@ -4,6 +4,8 @@ My implementation of Lox programming language from [Crafting interpreters](https
 
 ## How to run
 
+Install [PDM](https://github.com/pdm-project/pdm) package manager to manage dependencies.
+
 ```sh
 $ pdm install
 $ source .venv/bin/activate
@@ -14,6 +16,11 @@ To generate ast files,
 
 ```sh
 $ pdm run gen-ast src/python_lox/ast
+```
+
+To run type checkers and tests
+```sh
+$ pdm run check
 ```
 
 ## Screenshots

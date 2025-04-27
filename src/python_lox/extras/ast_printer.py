@@ -1,9 +1,9 @@
-from typing import override, List
+from typing import List, override
+
 from ..ast import expr as Expr
 
 
 class ASTPrinter(Expr.Visitor[str]):
-
     def print(self, expr: Expr.Expr) -> str:
         return expr.accept(self)
 

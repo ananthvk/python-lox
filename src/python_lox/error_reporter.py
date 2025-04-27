@@ -1,4 +1,5 @@
-from typing import Literal, List, Tuple
+from typing import List, Literal, Tuple
+
 from .token import Token
 
 ErrorLevel = Literal["warn", "error", "fatal"]

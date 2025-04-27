@@ -1,6 +1,7 @@
-import typer
-from typing import List, Tuple, Dict, Any
 from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import typer
 from rich import print
 
 ast_classes: Dict[str, Any] = {
@@ -93,7 +94,7 @@ def class_template(module: str, class_name: str, attributes: List[Tuple[str, str
     return f"""
 @dataclass
 class {class_name.capitalize()}({module.capitalize()}):
-{'\n'.join(attribute_strings)}
+{"\n".join(attribute_strings)}
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_{class_name}_{module}(self)
@@ -113,7 +114,7 @@ T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
-{'\n'.join(methods)}
+{"\n".join(methods)}
 """
 
 

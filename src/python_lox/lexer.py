@@ -1,9 +1,8 @@
 from typing import List
 
-from .exceptions import LexerException
-from .token import Token, TokenType
-from .token import keywords, double_char_tokens, single_char_tokens
 from .error_reporter import ErrorReporter
+from .exceptions import LexerException
+from .token import Token, TokenType, double_char_tokens, keywords, single_char_tokens
 
 
 class Lexer:
@@ -106,7 +105,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("x") or lexeme.endswith("X"):
             raise LexerException(
-                f"Syntax Error: Incomplete hexadecimal literal 0x",
+                "Syntax Error: Incomplete hexadecimal literal 0x",
                 self.line,
                 self.index,
                 self.current,
@@ -135,7 +134,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("b") or lexeme.endswith("B"):
             raise LexerException(
-                f"Syntax Error: Incomplete binary literal 0b",
+                "Syntax Error: Incomplete binary literal 0b",
                 self.line,
                 self.index,
                 self.current,
@@ -164,7 +163,7 @@ class Lexer:
         lexeme = self.source[self.index : self.current]
         if lexeme.endswith("o") or lexeme.endswith("O"):
             raise LexerException(
-                f"Syntax Error: Incomplete octal literal 0o",
+                "Syntax Error: Incomplete octal literal 0o",
                 self.line,
                 self.index,
                 self.current,
@@ -234,7 +233,7 @@ class Lexer:
         literal = self.source[self.index : self.current]
         try:
             token.literal = int(literal)
-        except:
+        except Exception:
             token.literal = float(literal)
         return token
 

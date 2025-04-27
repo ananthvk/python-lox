@@ -1,7 +1,7 @@
+from .error_reporter import ErrorReporter
+from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
-from .interpreter import Interpreter
-from .error_reporter import ErrorReporter
 
 
 class Lox:

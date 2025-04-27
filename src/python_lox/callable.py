@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING, Final, override
+from typing import TYPE_CHECKING, Final, List, override
 
-from .exceptions import ReturnException
-from .ast import stmt, expr
+from .ast import expr, stmt
 from .environment import Environment
+from .exceptions import ReturnException
 
 if TYPE_CHECKING:
     from .interpreter import Interpreter

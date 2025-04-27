@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Literal, Set
+from typing import Dict, Literal, Set, Tuple
 
 from .exceptions import NameException
 from .token import Token

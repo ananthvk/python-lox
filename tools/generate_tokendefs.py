@@ -1,6 +1,7 @@
-import typer
 from pathlib import Path
 from typing import List
+
+import typer
 from rich import print
 
 """
@@ -84,7 +85,7 @@ from enum import Enum, auto
 from dataclasses import dataclass
 
 class TokenType(Enum):
-{'\n'.join(tokens)}
+{"\n".join(tokens)}
 """
 
 

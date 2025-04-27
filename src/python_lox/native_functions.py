@@ -1,8 +1,9 @@
-import time
 import math
+import time
+from typing import TYPE_CHECKING, List
+
 from .callable import Callable
 from .exceptions import RuntimeException
-from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .interpreter import Interpreter
@@ -79,7 +80,7 @@ class ParseInt(Callable):
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         try:
             return int(args[0])  # type: ignore
-        except:
+        except Exception:
             return None
 
     def name(self) -> str:
@@ -96,7 +97,7 @@ class ParseFloat(Callable):
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         try:
             return float(args[0])  # type: ignore
-        except:
+        except Exception:
             return None
 
     def name(self) -> str:

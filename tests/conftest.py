@@ -1,9 +1,10 @@
+import subprocess
 from io import StringIO
 from typing import List
+
 from python_lox.interpreter import Interpreter
 from python_lox.lexer import Lexer
 from python_lox.parser import Parser
-import subprocess
 
 
 def interpret(source: str):
@@ -25,4 +26,4 @@ def exec_command(args: List[str]):
     result = subprocess.run(args, capture_output=True)
     assert (
         result.returncode == 0
-    ), f"{args[0]} failed with exit code {result.returncode}"
+    ), f"{args[0]} failed with exit code {result.returncode}"  # fmt: skip
