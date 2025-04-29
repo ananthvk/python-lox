@@ -2,7 +2,7 @@ from .error_reporter import ErrorReporter
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
-from .resolver import Resolver
+from .resolver import IdentifierState, Resolver
 
 
 class Lox:
@@ -13,9 +13,14 @@ class Lox:
         self.error_reporter = error_reporter
         self.interpreter = Interpreter(error_reporter=error_reporter)
         self.resolver = Resolver(self.interpreter, self.error_reporter)
+        self.error_reporter.is_error = False
+        self.error_reporter.messages.clear()
+        self.resolver.scopes = []
         self.resolver.scopes.append({})
         for global_value in self.interpreter.globals.values.keys():
-            self.resolver.scopes[0][global_value] = True
+            self.resolver.scopes[0][global_value] = IdentifierState(
+                is_init=True, is_defined=True, is_mutable=True
+            )
 
     def run(self, source: str, repl: bool = False) -> int:
         """

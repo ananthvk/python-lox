@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, Final, List, override
 
 from .ast import expr as Expr
 from .ast import stmt as Stmt
-from .error_reporter import ErrorReporter
+from .error_reporter import ErrorLevel, ErrorReporter
 from .exceptions import NameException
 from .token import Token
 
@@ -10,26 +11,27 @@ if TYPE_CHECKING:
     from .interpreter import Interpreter
 
 
+@dataclass
+class IdentifierState:
+    is_mutable: bool = False
+    is_init: bool = False
+    is_defined: bool = False
+
+
 class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
     def __init__(
         self, interpreter: "Interpreter", error_reporter: ErrorReporter | None = None
     ) -> None:
         self.interpreter: Final["Interpreter"] = interpreter
-        self.scopes: List[Dict[str, bool]] = []
+        self.scopes: List[Dict[str, IdentifierState]] = []
         self.error_reporter = error_reporter
 
     def resolve(self, obj: Stmt.Stmt | Expr.Expr | List[Stmt.Stmt]) -> None:
-        try:
-            if isinstance(obj, list):
-                for item in obj:
-                    self.resolve(item)
-            else:
-                obj.accept(self)
-        except NameException as e:
-            if self.error_reporter:
-                self.error_reporter.report("error", str(e), e.token)
-            else:
-                raise e
+        if isinstance(obj, list):
+            for item in obj:
+                self.resolve(item)
+        else:
+            obj.accept(self)
 
     def begin_scope(self) -> None:
         self.scopes.append({})
@@ -39,22 +41,38 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     def declare(self, name: Token) -> None:
         scope = self.scopes[-1]
-        """
-        False indicates that the variable is present in the innermost scope, and that it shadows a variable
-        in the outer scope, but is not yet ready used.
-        """
-        scope[name.string_repr] = False
+        scope[name.string_repr] = IdentifierState()
 
     def define(self, name: Token) -> None:
-        """
-        After running the initializer and setting the value, the variable is ready for use, so we mark it as true
-        """
         scope = self.scopes[-1]
-        scope[name.string_repr] = True
+        if name.string_repr in scope:
+            scope[name.string_repr].is_defined = True
+        else:
+            self.report_error(
+                f"Error: Trying to define identifier {name.string_repr} without declaring it",
+                token=name,
+            )
 
-    def resolve_local(self, expr: Expr.Expr, name: Token) -> None:
+    def resolve_local(
+        self,
+        expr: Expr.Expr,
+        name: Token,
+        should_be_init: bool = False,
+        should_be_mutable: bool = False,
+    ) -> None:
         for i in range(len(self.scopes) - 1, -1, -1):
             if name.string_repr in self.scopes[i]:
+                ident = self.scopes[i][name.string_repr]
+                if should_be_init and not ident.is_init:
+                    self.report_error(
+                        f'Variable "{name.string_repr}" is not initialized', token=name
+                    )
+                if should_be_mutable and not ident.is_mutable:
+                    self.report_error(
+                        f'Variable "{name.string_repr}" is declared const, and cannot be modified',
+                        token=name,
+                    )
+                ident.is_init = True
                 self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
                 return
 
@@ -62,16 +80,32 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         The name was not resolved: Note I have decided to make my interpreter stricter, i.e. it does not assume
         that the variable is available globally.
         """
-        raise NameException(
-            f'Name Error: Access of undefined variable. "{name.string_repr}" was not found in current scope"',
-            token=name,
+        self.report_error(
+            f'Name Error: Access of undefined variable. "{name.string_repr}" was not found in current scope',
+            name,
         )
+
+    def report_error(
+        self, message: str, token: Token, severity: ErrorLevel = "error"
+    ) -> None:
+        if self.error_reporter:
+            self.error_reporter.report(severity, message=message, token=token)
+        else:
+            raise NameException(
+                message,
+                token=token,
+            )
 
     def resolve_function(self, params: List[Token], body: List[Stmt.Stmt]) -> None:
         self.begin_scope()
         for param in params:
             self.declare(param)
             self.define(param)
+            """
+            Inside the function, all the parameter variables are initialized
+            """
+            self.scopes[-1][param.string_repr].is_init = True
+
         self.resolve(body)
         self.end_scope()
 
@@ -83,17 +117,31 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_var_stmt(self, stmt: Stmt.Var) -> None:
+        if stmt.name.string_repr in self.scopes[-1]:
+            self.report_error(
+                f'var "{stmt.name.string_repr}" has already been declared in this scope',
+                token=stmt.name,
+            )
         self.declare(stmt.name)
+
         if stmt.initializer:
             self.resolve(stmt.initializer)
+            self.scopes[-1][stmt.name.string_repr].is_init = True
+
         self.define(stmt.name)
+        self.scopes[-1][stmt.name.string_repr].is_mutable = True
 
     @override
     def visit_const_stmt(self, stmt: Stmt.Const) -> None:
-        # TODO: Actually implement this
+        if stmt.name.string_repr in self.scopes[-1]:
+            self.report_error(
+                f'const "{stmt.name.string_repr}" has already been declared in this scope',
+                token=stmt.name,
+            )
         self.declare(stmt.name)
         if stmt.initializer:
             self.resolve(stmt.initializer)
+            self.scopes[-1][stmt.name.string_repr].is_init = True
         self.define(stmt.name)
 
     @override
@@ -101,26 +149,37 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         """
         If the variable is declared, but not yet defined, it means that the variable is being used in it's own initializer
         """
-        is_defined = self.scopes[-1].get(expr.name.string_repr)
-        if is_defined is not None and is_defined is False:
-            raise NameException(
+
+        ident = self.scopes[-1].get(expr.name.string_repr)
+        if ident is not None and ident.is_defined is False:
+            self.report_error(
                 f"Name Error: Variable {expr.name.string_repr} is being used in its own initializer",
                 token=expr.name,
             )
-        self.resolve_local(expr, expr.name)
+            return
+
+        self.resolve_local(expr, expr.name, should_be_init=True)
 
     @override
     def visit_assign_expr(self, expr: Expr.Assign) -> None:
         self.resolve(expr.value)
-        self.resolve_local(expr, expr.name)
+        self.resolve_local(expr, expr.name, should_be_mutable=True)
 
     @override
     def visit_function_stmt(self, stmt: Stmt.Function) -> None:
         """
         Declare and define the function before it's scope so that recursion is possible
         """
+        is_declared = self.scopes[-1].get(stmt.name.string_repr)
+        if is_declared is not None:
+            self.report_error(
+                f"Name Error: function {stmt.name.string_repr} has already been declared in this scope",
+                token=stmt.name,
+            )
+
         self.declare(stmt.name)
         self.define(stmt.name)
+        self.scopes[-1][stmt.name.string_repr].is_init = True
         self.resolve_function(stmt.params, stmt.body)
 
     @override

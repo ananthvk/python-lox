@@ -15,7 +15,6 @@ class Parser:
     ) -> None:
         self.tokens = tokens
         self.error_reporter = error_reporter
-        self.loop_depth = 0
 
         # Next token to be processed
         self.current: int = 0
@@ -499,12 +498,8 @@ class Parser:
 
         self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "while"')
 
-        try:
-            self.loop_depth += 1
-            body = self.block_statement()
-            return stmt.While(condition=expression, body=body)
-        finally:
-            self.loop_depth -= 1
+        body = self.block_statement()
+        return stmt.While(condition=expression, body=body)
 
     def for_statement(self) -> stmt.For:
         # For loop is of the form for initializer ; condition; update {}
@@ -537,35 +532,25 @@ class Parser:
             update = self.expression()
 
         self.consume([TokenType.LEFT_BRACE], 'Expected "{" block after "for"')
-        try:
-            self.loop_depth += 1
-            body: stmt.Block = self.block_statement()
-        finally:
-            self.loop_depth -= 1
+        body: stmt.Block = self.block_statement()
 
         return stmt.For(
             initializer=initializer, body=body, condition=expression, update=update
         )
 
     def break_statement(self) -> stmt.Break:
-        if self.loop_depth > 0:
-            self.consume(
-                [TokenType.SEMICOLON],
-                'Expected ";" after break statement',
-            )
-            return stmt.Break()
-
-        raise ParserException('"break" outside loop', token=self.previous())
+        self.consume(
+            [TokenType.SEMICOLON],
+            'Expected ";" after break statement',
+        )
+        return stmt.Break()
 
     def continue_statement(self) -> stmt.Continue:
-        if self.loop_depth > 0:
-            self.consume(
-                [TokenType.SEMICOLON],
-                'Expected ";" after continue statement',
-            )
-            return stmt.Continue()
-
-        raise ParserException('"continue" outside loop', token=self.previous())
+        self.consume(
+            [TokenType.SEMICOLON],
+            'Expected ";" after continue statement',
+        )
+        return stmt.Continue()
 
     def assert_statement(self) -> stmt.Assert:
         exp = self.logical_or()
