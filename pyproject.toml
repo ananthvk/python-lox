@@ -51,6 +51,7 @@ check = { composite = [
     "pdm run format",
     "pdm run typecheck",
     "pdm run test",
+    "pdm run codespell",
 ] }
 
 

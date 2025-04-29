@@ -2,6 +2,7 @@ from .error_reporter import ErrorReporter
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
+from .resolver import Resolver
 
 
 class Lox:
@@ -11,6 +12,10 @@ class Lox:
     def __init__(self, error_reporter: ErrorReporter) -> None:
         self.error_reporter = error_reporter
         self.interpreter = Interpreter(error_reporter=error_reporter)
+        self.resolver = Resolver(self.interpreter, self.error_reporter)
+        self.resolver.scopes.append({})
+        for global_value in self.interpreter.globals.values.keys():
+            self.resolver.scopes[0][global_value] = True
 
     def run(self, source: str, repl: bool = False) -> int:
         """
@@ -20,8 +25,13 @@ class Lox:
         tokens = lexer.process()
         parser = Parser(tokens, self.error_reporter)
         statements = parser.parse(repl)
-        if statements is not None:
-            self.interpreter.interpret(statements)
-            return 0
-        else:
+        if statements is None:
             return 1
+
+        self.resolver.resolve(statements)
+
+        if self.error_reporter.is_error:
+            return 1
+
+        self.interpreter.interpret(statements)
+        return 0

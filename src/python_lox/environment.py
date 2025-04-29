@@ -64,3 +64,21 @@ class Environment:
             return self.parent.get(token)
 
         raise NameException(f'Name Error: "{token.string_repr}" is not defined', token)
+
+    def get_at(self, nesting: int, token: Token) -> object:
+        environment: Environment = self
+        for _ in range(nesting):
+            if not environment.parent:
+                break
+            environment = environment.parent
+
+        return environment.get(token)
+
+    def assign_at(self, nesting: int, token: Token, value: object) -> None:
+        environment: Environment = self
+        for _ in range(nesting):
+            if not environment.parent:
+                break
+            environment = environment.parent
+
+        environment.assign(token, value)

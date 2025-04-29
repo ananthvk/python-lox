@@ -1,5 +1,5 @@
 import sys
-from typing import Final, List, TextIO, TypeGuard, override
+from typing import Dict, Final, List, TextIO, TypeGuard, override
 
 from .ast import expr as Expr
 from .ast import stmt as Stmt
@@ -14,7 +14,7 @@ from .exceptions import (
     RuntimeException,
 )
 from .native_functions import native_functions
-from .token import TokenType
+from .token import Token, TokenType
 
 """
 NOTES:
@@ -34,6 +34,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         self.stdout = stdout
         self.globals: Final = Environment()
         self.environment = self.globals
+        self.nesting: Dict[int, int] = {}
 
         for function in native_functions:
             self.globals.values[function.name()] = ("initialized", function)
@@ -151,8 +152,9 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_assign_expr(self, expr: Expr.Assign) -> object:
+        nesting = self.nesting[id(expr)]
         value = self.evaluate(expr.value)
-        self.environment.assign(expr.name, value)
+        self.environment.assign_at(nesting, expr.name, value)
         return value
 
     @override
@@ -241,7 +243,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_variable_expr(self, expr: Expr.Variable) -> object:
-        return self.environment.get(expr.name)
+        return self.lookup_variable(expr.name, expr)
 
     @override
     def visit_block_stmt(self, stmt: Stmt.Block) -> None:
@@ -396,3 +398,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             if self.error_reporter is None:
                 raise e
             self.error_reporter.report("error", f"{e}", token=e.token)
+
+    def resolve(self, expr: Expr.Expr, nesting: int) -> None:
+        self.nesting[id(expr)] = nesting
+
+    def lookup_variable(self, name: Token, expr: Expr.Expr) -> object:
+        nesting = self.nesting[id(expr)]
+        return self.environment.get_at(nesting, name)
