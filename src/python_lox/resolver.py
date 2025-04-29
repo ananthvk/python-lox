@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import TYPE_CHECKING, Dict, Final, List, override
 
 from .ast import expr as Expr
@@ -18,6 +19,11 @@ class IdentifierState:
     is_defined: bool = False
 
 
+class FunctionType(Enum):
+    NONE = auto()
+    FUNCTION = auto()
+
+
 class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
     def __init__(
         self, interpreter: "Interpreter", error_reporter: ErrorReporter | None = None
@@ -25,6 +31,8 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.interpreter: Final["Interpreter"] = interpreter
         self.scopes: List[Dict[str, IdentifierState]] = []
         self.error_reporter = error_reporter
+        self.loop_depth = 0
+        self.current_function = FunctionType.NONE
 
     def resolve(self, obj: Stmt.Stmt | Expr.Expr | List[Stmt.Stmt]) -> None:
         if isinstance(obj, list):
@@ -96,7 +104,11 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
                 token=token,
             )
 
-    def resolve_function(self, params: List[Token], body: List[Stmt.Stmt]) -> None:
+    def resolve_function(
+        self, params: List[Token], body: List[Stmt.Stmt], function_type: FunctionType
+    ) -> None:
+        enclosing = self.current_function
+        self.current_function = function_type
         self.begin_scope()
         for param in params:
             self.declare(param)
@@ -108,6 +120,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
         self.resolve(body)
         self.end_scope()
+        self.current_function = enclosing
 
     @override
     def visit_block_stmt(self, stmt: Stmt.Block) -> None:
@@ -170,6 +183,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         """
         Declare and define the function before it's scope so that recursion is possible
         """
+        # TODO: Fix bug where in the REPL, a function declaration fails, but does not allow redeclaration
         is_declared = self.scopes[-1].get(stmt.name.string_repr)
         if is_declared is not None:
             self.report_error(
@@ -180,11 +194,11 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.declare(stmt.name)
         self.define(stmt.name)
         self.scopes[-1][stmt.name.string_repr].is_init = True
-        self.resolve_function(stmt.params, stmt.body)
+        self.resolve_function(stmt.params, stmt.body, FunctionType.FUNCTION)
 
     @override
     def visit_arrow_expr(self, expr: Expr.Arrow) -> None:
-        self.resolve_function(expr.params, expr.body)
+        self.resolve_function(expr.params, expr.body, FunctionType.FUNCTION)
 
     @override
     def visit_assert_stmt(self, stmt: Stmt.Assert) -> None:
@@ -197,7 +211,10 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_break_stmt(self, stmt: Stmt.Break) -> None:
-        pass
+        if self.loop_depth == 0:
+            self.report_error(
+                'Syntax Error: "break" statement outside a loop', token=stmt.keyword
+            )
 
     @override
     def visit_call_expr(self, expr: Expr.Call) -> None:
@@ -207,7 +224,10 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_continue_stmt(self, stmt: Stmt.Continue) -> None:
-        pass
+        if self.loop_depth == 0:
+            self.report_error(
+                'Syntax Error: "continue" statement outside a loop', token=stmt.keyword
+            )
 
     @override
     def visit_expression_stmt(self, stmt: Stmt.Expression) -> None:
@@ -215,13 +235,18 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_for_stmt(self, stmt: Stmt.For) -> None:
+        self.begin_scope()
         if stmt.initializer:
             self.resolve(stmt.initializer)
         if stmt.condition:
             self.resolve(stmt.condition)
         if stmt.update:
             self.resolve(stmt.update)
+
+        self.loop_depth += 1
         self.resolve(stmt.body)
+        self.loop_depth -= 1
+        self.end_scope()
 
     @override
     def visit_grouping_expr(self, expr: Expr.Grouping) -> None:
@@ -253,6 +278,11 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_return_stmt(self, stmt: Stmt.Return) -> None:
+        if self.current_function == FunctionType.NONE:
+            self.report_error(
+                'Syntax Error: "return" statement outside a function',
+                token=stmt.keyword,
+            )
         if stmt.value:
             self.resolve(stmt.value)
 
@@ -269,4 +299,6 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
     @override
     def visit_while_stmt(self, stmt: Stmt.While) -> None:
         self.resolve(stmt.condition)
+        self.loop_depth += 1
         self.resolve(stmt.body)
+        self.loop_depth -= 1

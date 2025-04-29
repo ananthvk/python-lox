@@ -154,12 +154,16 @@ class For(Stmt):
 
 @dataclass
 class Break(Stmt):
+    keyword: Token
+
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_break_stmt(self)
 
 
 @dataclass
 class Continue(Stmt):
+    keyword: Token
+
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_continue_stmt(self)
 

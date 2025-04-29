@@ -7,7 +7,6 @@ from ..token import Token
 if TYPE_CHECKING:
     from .stmt import Stmt
 
-
 T = TypeVar("T")
 
 

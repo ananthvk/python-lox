@@ -543,14 +543,14 @@ class Parser:
             [TokenType.SEMICOLON],
             'Expected ";" after break statement',
         )
-        return stmt.Break()
+        return stmt.Break(self.previous())
 
     def continue_statement(self) -> stmt.Continue:
         self.consume(
             [TokenType.SEMICOLON],
             'Expected ";" after continue statement',
         )
-        return stmt.Continue()
+        return stmt.Continue(self.previous())
 
     def assert_statement(self) -> stmt.Assert:
         exp = self.logical_or()

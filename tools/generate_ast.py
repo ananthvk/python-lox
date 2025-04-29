@@ -53,8 +53,8 @@ ast_classes: Dict[str, Any] = {
             ("condition", "Expr | None = None"),
             ("update", "Expr | None = None"),
         ],
-        "break": [],
-        "continue": [],
+        "break": [("keyword", "Token")],
+        "continue": [("keyword", "Token")],
         "assert": [
             ("expression", "Expr"),
             ("message_expression", "Expr | None = None"),
