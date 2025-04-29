@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Dict, Final, List, override
+from .flags import Flags
 
 from .ast import expr as Expr
 from .ast import stmt as Stmt
@@ -11,12 +12,18 @@ from .token import Token
 if TYPE_CHECKING:
     from .interpreter import Interpreter
 
+class IdentifierType(Enum):
+    VARIABLE = auto()
+    FUNCTION = auto()
 
 @dataclass
 class IdentifierState:
     is_mutable: bool = False
     is_init: bool = False
     is_defined: bool = False
+    is_used: bool = False
+    identifier_type: IdentifierType = IdentifierType.VARIABLE 
+    token: Token | None = None
 
 
 class FunctionType(Enum):
@@ -34,6 +41,9 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.loop_depth = 0
         self.current_function = FunctionType.NONE
 
+        # TODO: Later pass the flags to the resolver class through the constructor (dependency injection)
+        self.flags = Flags()
+
     def resolve(self, obj: Stmt.Stmt | Expr.Expr | List[Stmt.Stmt]) -> None:
         if isinstance(obj, list):
             for item in obj:
@@ -45,11 +55,20 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.scopes.append({})
 
     def end_scope(self) -> None:
+        if self.flags.get_bool("Wunused") and self.error_reporter:
+            for i, identifier in self.scopes[-1].items():
+                if not identifier.is_used:
+                    self.error_reporter.report(
+                        "warn",
+                        f'-Wunused: Unused {identifier.identifier_type.name.lower()} "{i}"',
+                        token=identifier.token,
+                    )
+
         self.scopes.pop()
 
     def declare(self, name: Token) -> None:
         scope = self.scopes[-1]
-        scope[name.string_repr] = IdentifierState()
+        scope[name.string_repr] = IdentifierState(token=name)
 
     def define(self, name: Token) -> None:
         scope = self.scopes[-1]
@@ -81,6 +100,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
                         token=name,
                     )
                 ident.is_init = True
+                ident.is_used = True
                 self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
                 return
 
@@ -194,6 +214,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.declare(stmt.name)
         self.define(stmt.name)
         self.scopes[-1][stmt.name.string_repr].is_init = True
+        self.scopes[-1][stmt.name.string_repr].identifier_type = IdentifierType.FUNCTION
         self.resolve_function(stmt.params, stmt.body, FunctionType.FUNCTION)
 
     @override

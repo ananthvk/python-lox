@@ -11,13 +11,17 @@ class ErrorReporter:
     def __init__(self) -> None:
         # Is there an active error
         self.is_error = False
+        self.is_warn = False
         self.messages: List[Tuple[ErrorLevel, str, Token | None]] = []
 
     def report(
         self, level: ErrorLevel, message: str, token: Token | None = None
     ) -> None:
         self.messages.append((level, message, token))
-        self.is_error = True
+        if level == "error" or level == "fatal":
+            self.is_error = True
+        else:
+            self.is_warn = True
 
     def too_many_errors(self) -> bool:
         return len(self.messages) > MAX_ERRORS

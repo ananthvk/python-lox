@@ -1,0 +1,6 @@
+fun foo() {
+    var x;
+}
+
+var y = 20;
+const z = 30;

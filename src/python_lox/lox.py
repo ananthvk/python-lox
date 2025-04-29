@@ -33,10 +33,16 @@ class Lox:
         if statements is None:
             return 1
 
+        """
+        Create a scope for the entire program
+        """
+        self.resolver.begin_scope()
         self.resolver.resolve(statements)
+        self.resolver.end_scope()
 
         if self.error_reporter.is_error:
             return 1
 
         self.interpreter.interpret(statements)
+
         return 0
