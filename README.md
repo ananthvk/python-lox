@@ -182,3 +182,30 @@ var z = calculate_area(50);
 println z;
 
 ```
+
+17) Resolver detects `break`, `continue` outside loop, `return` outside a function, and gives a warning when it detects unused variables or shadowed variables.
+```
+Program:
+1    var y = 80;
+2    {
+3       fun foo() {
+4           var y = 30;
+5           println "Y=" + to_string(y);
+6       }
+7
+8       foo();
+9    }
+
+
+Output:
+
+Y=30
+-Wshadow: Declaration of local variable "y" shadows previous declaration 
+    4 |         var y = 30;
+                    ^
+-Wshadow: "y" previously declared here 
+    1 | var y = 80;
+            ^
+-Wunused: Unused variable "y" 
+    1 | var y = 80;
+```

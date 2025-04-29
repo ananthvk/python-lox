@@ -1,20 +1,22 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Dict, Final, List, override
-from .flags import Flags
 
 from .ast import expr as Expr
 from .ast import stmt as Stmt
 from .error_reporter import ErrorLevel, ErrorReporter
 from .exceptions import NameException
+from .flags import Flags
 from .token import Token
 
 if TYPE_CHECKING:
     from .interpreter import Interpreter
 
+
 class IdentifierType(Enum):
     VARIABLE = auto()
     FUNCTION = auto()
+
 
 @dataclass
 class IdentifierState:
@@ -22,7 +24,7 @@ class IdentifierState:
     is_init: bool = False
     is_defined: bool = False
     is_used: bool = False
-    identifier_type: IdentifierType = IdentifierType.VARIABLE 
+    identifier_type: IdentifierType = IdentifierType.VARIABLE
     token: Token | None = None
 
 
@@ -67,6 +69,22 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.scopes.pop()
 
     def declare(self, name: Token) -> None:
+        # Check for shadowing
+        if self.flags.get_bool("Wshadow") and self.error_reporter:
+            for i in range(len(self.scopes) - 1, -1, -1):
+                value = self.scopes[i].get(name.string_repr)
+                if value is not None:
+                    self.error_reporter.report(
+                        "warn",
+                        f'-Wshadow: Declaration of local variable "{name.string_repr}" shadows previous declaration',
+                        token=name,
+                    )
+                    self.error_reporter.report(
+                        "warn",
+                        f'-Wshadow: "{name.string_repr}" previously declared here',
+                        token=value.token,
+                    )
+
         scope = self.scopes[-1]
         scope[name.string_repr] = IdentifierState(token=name)
 

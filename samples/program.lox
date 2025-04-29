@@ -1,6 +1,9 @@
-fun foo() {
-    var x;
-}
+var y = 80;
+{
+    fun foo() {
+        var y = 30;
+        println "Y=" + to_string(y);
+    }
 
-var y = 20;
-const z = 30;
+    foo();
+}

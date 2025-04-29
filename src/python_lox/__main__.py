@@ -2,17 +2,15 @@ import atexit
 import os
 import readline
 import sys
+from typing import Tuple
 
 import typer
 from rich import print
 from typing_extensions import Annotated
 
-from .error_reporter import ErrorReporter
+from .error_reporter import ErrorLevel, ErrorReporter
 from .lox import Lox
 from .token import Token
-from .error_reporter import ErrorLevel
-from typing import Tuple
-
 
 app = typer.Typer()
 
@@ -22,7 +20,11 @@ HISTORY_FILE = os.path.expanduser("~/.loxhistory")
 atexit.register(lambda: readline.write_history_file(HISTORY_FILE))
 
 
-def report_message(error_reporter: ErrorReporter, message: Tuple[ErrorLevel, str, Token | None], source: str) -> None:
+def report_message(
+    error_reporter: ErrorReporter,
+    message: Tuple[ErrorLevel, str, Token | None],
+    source: str,
+) -> None:
     token = message[2]
     extra_info: str = ""
     if token is None:
@@ -40,18 +42,19 @@ def report_message(error_reporter: ErrorReporter, message: Tuple[ErrorLevel, str
     else:
         print(f"[yellow]{message[1]} {extra_info}[/yellow]")
 
+
 def report_error(error_reporter: ErrorReporter, source: str) -> None:
     if error_reporter.is_error or error_reporter.is_warn:
         for message in error_reporter.messages:
-            if message[0] == 'warn':
+            if message[0] == "warn":
                 report_message(error_reporter, message, source)
         for message in error_reporter.messages:
-            if message[0] == 'error':
+            if message[0] == "error":
                 report_message(error_reporter, message, source)
         for message in error_reporter.messages:
-            if message[0] == 'fatal':
+            if message[0] == "fatal":
                 report_message(error_reporter, message, source)
-        #if error_reporter.too_many_errors():
+        # if error_reporter.too_many_errors():
         # TODO: Implement this
         #    print("[yellow] Too many errors. Further errors suppressed [/yellow]")
 
