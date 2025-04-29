@@ -43,9 +43,8 @@ class LoxFunction(Callable):
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         environment = Environment(parent=self.closure)
         for i in range(len(args)):
-            environment.declare(
-                self.declaration.params[i], val=args[i], initialize=True
-            )
+            environment.declare(self.declaration.params[i])
+            environment.define(self.declaration.params[i], args[i])
         try:
             interpreter.execute_multiple_statements(self.declaration.body, environment)
         except ReturnException as e:
@@ -73,9 +72,8 @@ class ArrowFunction(Callable):
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         environment = Environment(parent=self.closure)
         for i in range(len(args)):
-            environment.declare(
-                self.declaration.params[i], val=args[i], initialize=True
-            )
+            environment.declare(self.declaration.params[i])
+            environment.define(self.declaration.params[i], args[i])
         try:
             interpreter.execute_multiple_statements(self.declaration.body, environment)
         except ReturnException as e:

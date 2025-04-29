@@ -9,7 +9,6 @@ from .error_reporter import ErrorReporter
 from .exceptions import (
     BreakException,
     ContinueException,
-    NameException,
     ReturnException,
     RuntimeException,
 )
@@ -37,7 +36,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         self.nesting: Dict[int, int] = {}
 
         for function in native_functions:
-            self.globals.values[function.name()] = ("initialized", function)
+            self.globals.declare(function.name())
+            self.globals.define(function.name(), function)
 
     @override
     def visit_literal_expr(self, expr: Expr.Literal) -> object:
@@ -233,13 +233,9 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_var_stmt(self, stmt: Stmt.Var) -> None:
         self.environment.declare(stmt.name)
-
-        try:
-            if stmt.initializer:
-                self.environment.assign(stmt.name, self.evaluate(stmt.initializer))
-        except NameException as e:
-            del self.environment.values[stmt.name.string_repr]
-            raise e
+        if stmt.initializer:
+            result = self.evaluate(stmt.initializer)
+            self.environment.define(stmt.name, result)
 
     @override
     def visit_variable_expr(self, expr: Expr.Variable) -> object:
@@ -263,17 +259,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_const_stmt(self, stmt: Stmt.Const) -> None:
-        if self.environment.values.get(stmt.name.string_repr) is None:
-            self.environment.declare(
-                stmt.name,
-                const=True,
-                val=self.evaluate(stmt.initializer),
-                initialize=True,
-            )
-
-        # This will throw an error since the variable is already declared in the current scope
-        else:
-            self.environment.declare(stmt.name)
+        self.environment.declare(stmt.name)
+        self.environment.define(stmt.name, self.evaluate(stmt.initializer))
 
     @override
     def visit_if_stmt(self, stmt: Stmt.If) -> None:
@@ -368,7 +355,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_function_stmt(self, stmt: Stmt.Function) -> None:
         function = LoxFunction(declaration=stmt, closure=self.environment)
-        self.environment.declare(stmt.name, function, initialize=True)
+        self.environment.declare(stmt.name)
+        self.environment.define(stmt.name, function)
 
     @override
     def visit_arrow_expr(self, expr: Expr.Arrow) -> object:
@@ -390,11 +378,6 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 self.execute(statement)
 
         except RuntimeException as e:
-            if self.error_reporter is None:
-                raise e
-            self.error_reporter.report("error", f"{e}", token=e.token)
-
-        except NameException as e:
             if self.error_reporter is None:
                 raise e
             self.error_reporter.report("error", f"{e}", token=e.token)

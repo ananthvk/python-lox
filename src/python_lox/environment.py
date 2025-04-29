@@ -1,84 +1,63 @@
-from typing import Dict, Literal, Set, Tuple
+from typing import Dict
 
-from .exceptions import NameException
 from .token import Token
-
-EnvironmentValueType = Tuple[Literal["uninitialized", "initialized"], object]
 
 
 class Environment:
+    class UNSET:
+        pass
+
     def __init__(self, parent: "Environment | None" = None) -> None:
         self.parent: Environment | None = parent
-        self.values: Dict[str, EnvironmentValueType] = {}
-        self.const_variables: Set[str] = set()
+        self.values: Dict[str, object] = {}
+
+    def is_declared(self, name: Token | str) -> bool:
+        """
+        Returns true if "name" is declared in the current scope
+        Note: This method does not check all preceding environments, only the current one
+        """
+        if isinstance(name, Token):
+            return name.string_repr in self.values
+        return name in self.values
 
     def assign(self, token: Token, value: object) -> None:
-        if token.string_repr in self.const_variables:
-            raise NameException(
-                f'Type Error: Assignment not permitted since "{token.string_repr}" is declared const',
-                token,
-            )
-
-        v = self.values.get(token.string_repr)
-        if v is not None:
-            self.values[token.string_repr] = ("initialized", value)
-            return
-
-        if self.parent is not None:
+        if self.is_declared(token):
+            self.values[token.string_repr] = value
+        elif self.parent is not None:
             self.parent.assign(token, value)
-            return
-
-        raise NameException(f'Name Error: "{token.string_repr}" is not defined', token)
-
-    def declare(
-        self,
-        token: Token,
-        val: object | None = None,
-        initialize: bool = False,
-        const: bool = False,
-    ) -> None:
-        value = self.values.get(token.string_repr)
-        if value is not None:
-            raise NameException(
-                f'Name Error: "{token.string_repr}" has already been declared', token
-            )
-
-        if initialize:
-            self.values[token.string_repr] = ("initialized", val)
         else:
-            self.values[token.string_repr] = ("uninitialized", None)
-        if const:
-            self.const_variables.add(token.string_repr)
+            raise ValueError("Logic Error: This should not be thrown")
+
+    def declare(self, token: Token | str) -> None:
+        if isinstance(token, Token):
+            self.values[token.string_repr] = None
+        else:
+            self.values[token] = None
+
+    def define(self, token: Token | str, value: object) -> None:
+        if isinstance(token, Token):
+            self.values[token.string_repr] = value
+        else:
+            self.values[token] = value
 
     def get(self, token: Token) -> object:
-        value = self.values.get(token.string_repr)
-        if value is not None:
-            if value[0] == "uninitialized":
-                raise NameException(
-                    f'Value Error: "{token.string_repr}" is not initialized', token
-                )
-
-            return value[1]
-
-        if self.parent is not None:
+        v = self.values.get(token.string_repr)
+        if v is not None:
+            return v
+        elif self.parent is not None:
             return self.parent.get(token)
+        return None
 
-        raise NameException(f'Name Error: "{token.string_repr}" is not defined', token)
+    def ancestor(self, nesting: int) -> "Environment":
+        environment: Environment = self
+        for _ in range(nesting):
+            if not environment.parent:
+                break
+            environment = environment.parent
+        return environment
 
     def get_at(self, nesting: int, token: Token) -> object:
-        environment: Environment = self
-        for _ in range(nesting):
-            if not environment.parent:
-                break
-            environment = environment.parent
-
-        return environment.get(token)
+        return self.ancestor(nesting).get(token)
 
     def assign_at(self, nesting: int, token: Token, value: object) -> None:
-        environment: Environment = self
-        for _ in range(nesting):
-            if not environment.parent:
-                break
-            environment = environment.parent
-
-        environment.assign(token, value)
+        self.ancestor(nesting).assign(token, value)
