@@ -75,6 +75,7 @@ def main(file: Annotated[str, typer.Argument(help="Run this script")] = "") -> i
         with open(file, "r") as f:
             source = f.read()
         exit_code = lox.run(source)
+        lox.close()
         report_error(error_reporter, source)
         if error_reporter.is_error:
             sys.exit(1)

@@ -1,9 +1,11 @@
-var y = 80;
-{
-    fun foo() {
-        var y = 30;
-        println "Y=" + to_string(y);
-    }
+(yval) => {
+    var y = yval;
+    {
+        fun foo() {
+            var y = 30;
+            println "Y=" + to_string(y);
+        }
 
-    foo();
-}
+        foo();
+    }
+}(55);

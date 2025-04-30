@@ -22,6 +22,8 @@ class Lox:
                 is_init=True, is_defined=True, is_mutable=True
             )
 
+        self.resolver.begin_scope()
+
     def run(self, source: str, repl: bool = False) -> int:
         """
         Execute the source program
@@ -36,9 +38,7 @@ class Lox:
         """
         Create a scope for the entire program
         """
-        self.resolver.begin_scope()
         self.resolver.resolve(statements)
-        self.resolver.end_scope()
 
         if self.error_reporter.is_error:
             return 1
@@ -46,3 +46,6 @@ class Lox:
         self.interpreter.interpret(statements)
 
         return 0
+
+    def close(self) -> None:
+        self.resolver.end_scope()
