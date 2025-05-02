@@ -2,7 +2,9 @@ program              = declaration* EOF
 declaration          = const_declaration 
                       | variable_declaration 
                       | function_declaration
+                      | class_declaration
                       | statement
+class_declaration    = "class" IDENTIFIER "{" function* "}" 
 function_declaration = "fun" function
 function             = IDENTIFIER "(" parameters? ")" block
 parameters           = IDENTIFIER ( "," IDENTIFIER ) * 
@@ -35,7 +37,7 @@ println_statement      = "println" expression ";"
 expression_statement = expression ";"
 expression           = comma
 comma                = assignment ( "," assignment )*
-assignment           = IDENTIFIER assignment_operator assignment | ternary
+assignment           = (call ".")? IDENTIFIER assignment_operator assignment | ternary
 asssignment_operator = "=" | "*=" | "+=" | "-=" | "/=" | "%="
 ternary              = logical_or | logical_or "?" expression ":" ternary
 logical_or           = logical_and ("or" logical_and)*
@@ -45,7 +47,7 @@ comparison           = term | ( (">" | ">=" | "<" | "<=") term)*
 term                 = factor | ( ("+" | "-") factor)*
 factor               = unary | ( ("*" | "/" | "%") unary)*
 unary                = (("!" | "-" | "not") unary) | call
-call                 = primary ( "(" arguments? ")")*
+call                 = primary ( "(" arguments? ")" | "." IDENTIFIER)*
 arguments            = assignment ("," assignment)*
 primary              = "false" | "true" | "nil"
                       | NUMBER | STRING | "(" expression ")"

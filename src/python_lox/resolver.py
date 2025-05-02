@@ -31,6 +31,7 @@ class IdentifierState:
 class FunctionType(Enum):
     NONE = auto()
     FUNCTION = auto()
+    METHOD = auto()
 
 
 class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
@@ -344,3 +345,26 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.loop_depth += 1
         self.resolve(stmt.body)
         self.loop_depth -= 1
+
+    @override
+    def visit_class_stmt(self, stmt: Stmt.Class) -> None:
+        self.declare(stmt.name)
+        self.define(stmt.name)
+        self.scopes[-1][stmt.name.string_repr].is_init = True
+        for method in stmt.methods:
+            declaration = FunctionType.METHOD
+            self.resolve_function(
+                params=method.params, body=method.body, function_type=declaration
+            )
+
+    @override
+    def visit_get_expr(self, expr: Expr.Get) -> None:
+        """
+        Do not resolve the right side, since it is done dynamically, and not statically
+        """
+        self.resolve(expr.obj)
+
+    @override
+    def visit_set_expr(self, expr: Expr.Set) -> None:
+        self.resolve(expr.value)
+        self.resolve(expr.obj)

@@ -65,6 +65,10 @@ class Visitor(ABC, Generic[T]):
     def visit_return_stmt(self, stmt: "Return") -> T:
         pass
 
+    @abstractmethod
+    def visit_class_stmt(self, stmt: "Class") -> T:
+        pass
+
 
 class Stmt(ABC):
     @abstractmethod
@@ -194,3 +198,12 @@ class Return(Stmt):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_return_stmt(self)
+
+
+@dataclass
+class Class(Stmt):
+    name: Token
+    methods: List[Function]
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_class_stmt(self)

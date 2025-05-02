@@ -59,3 +59,11 @@ class ASTPrinter(Expr.Visitor[str]):
     @override
     def visit_arrow_expr(self, expr: Expr.Arrow) -> str:
         return self.parenthesize("=> function")
+
+    @override
+    def visit_get_expr(self, expr: Expr.Get) -> str:
+        return self.parenthesize("get ", expr.obj)
+
+    @override
+    def visit_set_expr(self, expr: Expr.Set) -> str:
+        return self.parenthesize("set ", expr.obj, expr.value)

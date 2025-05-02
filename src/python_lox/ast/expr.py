@@ -51,6 +51,14 @@ class Visitor(ABC, Generic[T]):
     def visit_arrow_expr(self, expr: "Arrow") -> T:
         pass
 
+    @abstractmethod
+    def visit_get_expr(self, expr: "Get") -> T:
+        pass
+
+    @abstractmethod
+    def visit_set_expr(self, expr: "Set") -> T:
+        pass
+
 
 class Expr(ABC):
     @abstractmethod
@@ -147,3 +155,22 @@ class Arrow(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_arrow_expr(self)
+
+
+@dataclass
+class Get(Expr):
+    obj: Expr
+    name: Token
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_get_expr(self)
+
+
+@dataclass
+class Set(Expr):
+    obj: Expr
+    name: Token
+    value: Expr
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_set_expr(self)

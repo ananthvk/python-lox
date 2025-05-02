@@ -101,41 +101,36 @@ class Parser:
             operator = self.previous()
             value = self.assign()
 
-            if isinstance(exp, expr.Variable):
-                name = exp.name
-                # Desugar to get binary + assignment
-                op: Token = copy(operator)
-                match operator.token_type:
-                    case TokenType.PLUS_EQUAL:
-                        op.token_type = TokenType.PLUS
-                        op.string_repr = "+"
-                    case TokenType.MINUS_EQUAL:
-                        op.token_type = TokenType.MINUS
-                        op.string_repr = "-"
-                    case TokenType.STAR_EQUAL:
-                        op.token_type = TokenType.STAR
-                        op.string_repr = "*"
-                    case TokenType.SLASH_EQUAL:
-                        op.token_type = TokenType.SLASH
-                        op.string_repr = "/"
-                    case TokenType.PERCENTAGE_EQUAL:
-                        op.token_type = TokenType.PERCENTAGE
-                        op.string_repr = "%"
-                    case TokenType.EQUAL:
-                        pass
-                    case _:
-                        raise SystemExit("Logic error")
+            op: Token = copy(operator)
+            match operator.token_type:
+                case TokenType.PLUS_EQUAL:
+                    op.token_type = TokenType.PLUS
+                    op.string_repr = "+"
+                case TokenType.MINUS_EQUAL:
+                    op.token_type = TokenType.MINUS
+                    op.string_repr = "-"
+                case TokenType.STAR_EQUAL:
+                    op.token_type = TokenType.STAR
+                    op.string_repr = "*"
+                case TokenType.SLASH_EQUAL:
+                    op.token_type = TokenType.SLASH
+                    op.string_repr = "/"
+                case TokenType.PERCENTAGE_EQUAL:
+                    op.token_type = TokenType.PERCENTAGE
+                    op.string_repr = "%"
+                case TokenType.EQUAL:
+                    pass
+                case _:
+                    raise SystemExit("Logic error")
 
-                if op.token_type == TokenType.EQUAL:
-                    # Simple assignment
-                    return expr.Assign(name=name, value=value)
-                else:
-                    return expr.Assign(
-                        name=name,
-                        value=expr.Binary(
-                            left=expr.Variable(name), operator=op, right=value
-                        ),
-                    )
+            # Perform desguaring, split augment assignment to binary + assignment
+            if op.token_type != TokenType.EQUAL:
+                value = expr.Binary(left=exp, operator=op, right=value)
+
+            if isinstance(exp, expr.Variable):
+                return expr.Assign(name=exp.name, value=value)
+            elif isinstance(exp, expr.Get):
+                return expr.Set(exp.obj, exp.name, value)
 
             if self.error_reporter is not None:
                 self.error_reporter.report(
@@ -247,6 +242,10 @@ class Parser:
                 args = self.function_args()
                 paren = self.previous()
                 exp = expr.Call(callee=exp, paren=paren, args=args)
+            elif self.match([TokenType.DOT]):
+                self.consume([TokenType.IDENTIFIER], 'Expected property name after "."')
+                name = self.previous()
+                exp = expr.Get(exp, name)
             else:
                 break
         return exp
@@ -568,8 +567,6 @@ class Parser:
     def statement(self) -> stmt.Stmt:
         if self.match([TokenType.RETURN]):
             return self.return_statement()
-        if self.match([TokenType.FUN]):
-            return self.function("function")
         if self.match([TokenType.PRINT]):
             return self.print_statement()
         if self.match([TokenType.PRINTLN]):
@@ -636,11 +633,27 @@ class Parser:
         )
         return stmt.Const(name, initializer=initializer)
 
+    def class_declaration(self) -> stmt.Class:
+        self.consume([TokenType.IDENTIFIER], message="Expected class name")
+        name = self.previous()
+        self.consume([TokenType.LEFT_BRACE], message='Expected "{" after class name')
+
+        methods: List[stmt.Function] = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            methods.append(self.function("method"))
+
+        self.consume([TokenType.RIGHT_BRACE], message='Expected "}" after class body')
+        return stmt.Class(name=name, methods=methods)
+
     def declaration(self) -> stmt.Stmt:
         if self.match([TokenType.VAR]):
             return self.variable_declaration()
         if self.match([TokenType.CONST]):
             return self.const_declaration()
+        if self.match([TokenType.FUN]):
+            return self.function("function")
+        if self.match([TokenType.CLASS]):
+            return self.class_declaration()
         return self.statement()
 
     def parse(self, repl: bool = False) -> List[stmt.Stmt] | None:

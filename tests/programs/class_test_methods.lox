@@ -1,0 +1,32 @@
+class Foo {
+    say_hi(name) {
+        return "Hello " + name;
+    }
+    
+    add(a, b) {
+        return a + b;
+    }
+}
+
+
+var foo = Foo();
+
+assert foo.say_hi("world") == "Hello world";
+assert foo.add(3, 8) == 11;
+assert foo.add("good", "bye") == "goodbye";
+
+foo.subtract = (x, y) => {
+    return x - y;
+};
+
+foo.multiply = (x, y) => x * y;
+
+foo.multiple = (x, y, z) => {
+    const value1 = foo.multiply(x, y);
+    const value2 = foo.subtract(y, z);
+    const value3 = foo.add(x, z);
+    return 100 * value3 + 10 * value2 + 1 * value1;
+};
+
+assert foo.subtract(10, 1) == 9;
+assert foo.multiple(2, 4, 1) == 338;

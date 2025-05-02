@@ -1,0 +1,23 @@
+class X {
+}
+
+const x = X();
+
+x.a = 5;
+x.b = 6;
+x.c = 7;
+x.d = 8;
+x.e = 9;
+
+
+x.a *= 2;
+x.b += 3;
+x.c -= 10;
+x.d = 55;
+x.e = x.a + x.b;
+
+assert x.a == 10;
+assert x.b == 9;
+assert x.c == -3;
+assert x.d == 55;
+assert x.e == 19;

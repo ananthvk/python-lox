@@ -1,0 +1,35 @@
+class Calculator {
+    name() {
+        return "Calculator class";
+    }
+}
+
+const calc = Calculator();
+
+class Adder {
+    name(a, b) {
+        return a + b;
+    }
+}
+
+const adder = Adder();
+calc.adder = adder;
+calc.parameter = "Some parameter";
+
+class Operation {
+    name() {
+        return "Operation";
+    }
+}
+
+calc.adder.op = Operation();
+
+calc.adder.parameter = "Adder";
+
+assert calc.name() == "Calculator class";
+assert calc.parameter == "Some parameter";
+assert calc.adder.name(6, 8) == 14;
+assert calc.adder.op.name() == "Operation";
+
+assert calc.adder.parameter == "Adder";
+assert adder.parameter == "Adder";

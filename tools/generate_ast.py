@@ -31,8 +31,10 @@ ast_classes: Dict[str, Any] = {
         "call": [("callee", "Expr"), ("paren", "Token"), ("args", "List[Expr]")],
         "arrow": [
             ("params", "List[Token]"),
-            ("body", "List[Stmt]"),
+            ("body", 'List["Stmt"]'),
         ],
+        "get": [("obj", "Expr"), ("name", "Token")],
+        "set": [("obj", "Expr"), ("name", "Token"), ("value", "Expr")],
     },
     "stmt": {
         "expression": [("expression", "Expr")],
@@ -65,7 +67,19 @@ ast_classes: Dict[str, Any] = {
             ("body", "List[Stmt]"),
         ],
         "return": [("keyword", "Token"), ("value", "Expr | None = None")],
+        "class": [("name", "Token"), ("methods", "List[Function]")],
     },
+}
+
+imports = {
+    "expr": """
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .stmt import Stmt
+        """,
+    "stmt": """
+from .expr import  Expr
+    """,
 }
 
 module_header = """from typing import Generic, TypeVar, List
@@ -124,6 +138,7 @@ def main(output_directory: Path):
     for module, v in ast_classes.items():
         with open(output_directory / f"{module}.py", "w") as outfile:
             outfile.write(module_header)
+            outfile.write(imports[module])
             outfile.write(visitor_template(module, list(v.keys())))
             outfile.write(base_class_template(module))
             for cls, attrs in v.items():

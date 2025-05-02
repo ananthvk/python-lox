@@ -1,0 +1,12 @@
+// Empty class
+class X {
+}
+
+// Class with one method
+class Foo {
+    name() {
+        return "Hello foo";
+    }
+}
+
+assert Foo().name() == "Hello foo";
