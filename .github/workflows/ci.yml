@@ -1,0 +1,33 @@
+name: Ubuntu (build and test)
+on: [push]
+jobs:
+    Build-And-Test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup PDM
+              uses: pdm-project/setup-pdm@v4
+              with:
+                python-version: 3.10
+                cache: true
+            # You are now able to use PDM in your workflow
+            - name: Install dependencies
+              run: pdm install
+
+            - name: Lint check
+              run: |
+                pdm run ruff check .
+                pdm run ruff check . --select I
+            
+            - name: Type check
+              run: |
+                pdm run typecheck
+            
+            - name: Style check
+              run: |
+                pdm run ruff format . --check
+                pdm run black . --check
+            
+            - name: Tests
+              run: pdm run test
+          

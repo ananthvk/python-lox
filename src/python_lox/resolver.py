@@ -104,7 +104,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         name: Token,
         should_be_init: bool = False,
         should_be_mutable: bool = False,
-    ) -> None:
+    ) -> bool:
         for i in range(len(self.scopes) - 1, -1, -1):
             if name.string_repr in self.scopes[i]:
                 ident = self.scopes[i][name.string_repr]
@@ -120,7 +120,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
                 ident.is_init = True
                 ident.is_used = True
                 self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
-                return
+                return True
 
         """
         The name was not resolved: Note I have decided to make my interpreter stricter, i.e. it does not assume
@@ -130,6 +130,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
             f'Name Error: Access of undefined variable. "{name.string_repr}" was not found in current scope',
             name,
         )
+        return False
 
     def report_error(
         self, message: str, token: Token, severity: ErrorLevel = "error"
@@ -200,6 +201,8 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         """
         If the variable is declared, but not yet defined, it means that the variable is being used in it's own initializer
         """
+
+        # TODO: Fix bug where if the initializer fails, the name is still reserved and cannot be declared again in REPL
 
         ident = self.scopes[-1].get(expr.name.string_repr)
         if ident is not None and ident.is_defined is False:
