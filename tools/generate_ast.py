@@ -35,6 +35,7 @@ ast_classes: Dict[str, Any] = {
         ],
         "get": [("obj", "Expr"), ("name", "Token")],
         "set": [("obj", "Expr"), ("name", "Token"), ("value", "Expr")],
+        "this": [("keyword", "Token")],
     },
     "stmt": {
         "expression": [("expression", "Expr")],

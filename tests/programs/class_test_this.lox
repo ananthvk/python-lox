@@ -1,0 +1,51 @@
+class Fruit {
+    setName(name) {
+        this.name = name;
+    }
+    getName() {
+        return this.name;
+    }
+}
+
+const fruit = Fruit();
+fruit.setName("Apple");
+assert fruit.name == "Apple";
+assert fruit.getName() == "Apple";
+
+class Person {
+    set_name(name) {
+        this.name = name;
+    }
+    get_name() {
+        return this.name;
+    }
+    set_method() {
+        this.say_hi = () => {
+            return "Hi " + this.name;
+        };
+    }
+}
+
+const alice = Person();
+alice.set_name("Alice");
+
+var bob = Person();
+bob.set_name("Bob");
+
+assert alice.get_name() == "Alice";
+assert bob.get_name() == "Bob";
+
+const method = alice.get_name;
+assert method() == "Alice";
+
+bob.get_name = alice.get_name;
+// Test that when a bound method is assigned to another instance, it retains the instance to which it is bound
+assert bob.get_name() == "Alice";
+
+alice.set_method();
+bob.set_method();
+
+assert alice.say_hi() == "Hi Alice";
+assert bob.say_hi() == "Hi Bob";
+bob.say_hi = alice.say_hi;
+assert bob.say_hi() == "Hi Alice";

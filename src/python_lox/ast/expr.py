@@ -59,6 +59,10 @@ class Visitor(ABC, Generic[T]):
     def visit_set_expr(self, expr: "Set") -> T:
         pass
 
+    @abstractmethod
+    def visit_this_expr(self, expr: "This") -> T:
+        pass
+
 
 class Expr(ABC):
     @abstractmethod
@@ -174,3 +178,11 @@ class Set(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_set_expr(self)
+
+
+@dataclass
+class This(Expr):
+    keyword: Token
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_this_expr(self)

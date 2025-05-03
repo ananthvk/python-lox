@@ -340,6 +340,9 @@ class Parser:
         if self.match([TokenType.TRUE]):
             return expr.Literal(value=True)
 
+        if self.match([TokenType.THIS]):
+            return expr.This(keyword=self.previous())
+
         if self.match([TokenType.NIL]):
             return expr.Literal(value=None)
 

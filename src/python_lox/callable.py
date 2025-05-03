@@ -7,6 +7,7 @@ from .exceptions import ReturnException
 
 if TYPE_CHECKING:
     from .interpreter import Interpreter
+    from .lox_class import LoxInstance
 
 
 class Callable(ABC):
@@ -50,6 +51,11 @@ class LoxFunction(Callable):
         except ReturnException as e:
             return e.value
         return None
+
+    def bind(self, instance: "LoxInstance") -> "LoxFunction":
+        environment = Environment(parent=self.closure)
+        environment.define("this", instance)
+        return LoxFunction(declaration=self.declaration, closure=environment)
 
 
 class ArrowFunction(Callable):

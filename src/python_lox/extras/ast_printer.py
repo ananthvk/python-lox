@@ -67,3 +67,7 @@ class ASTPrinter(Expr.Visitor[str]):
     @override
     def visit_set_expr(self, expr: Expr.Set) -> str:
         return self.parenthesize("set ", expr.obj, expr.value)
+
+    @override
+    def visit_this_expr(self, expr: Expr.This) -> str:
+        return "(this)"

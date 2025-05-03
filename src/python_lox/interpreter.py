@@ -402,6 +402,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         obj.set(expr.name, value)
         return value
 
+    @override
+    def visit_this_expr(self, expr: Expr.This) -> object:
+        return self.lookup_variable(expr.keyword, expr)
+
     def execute(self, statement: Stmt.Stmt) -> None:
         statement.accept(self)
 

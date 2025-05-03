@@ -34,6 +34,11 @@ class FunctionType(Enum):
     METHOD = auto()
 
 
+class ClassType(Enum):
+    NONE = auto()
+    CLASS = auto()
+
+
 class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
     def __init__(
         self, interpreter: "Interpreter", error_reporter: ErrorReporter | None = None
@@ -43,6 +48,7 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.error_reporter = error_reporter
         self.loop_depth = 0
         self.current_function = FunctionType.NONE
+        self.current_class = ClassType.NONE
 
         # TODO: Later pass the flags to the resolver class through the constructor (dependency injection)
         self.flags = Flags()
@@ -348,14 +354,25 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_class_stmt(self, stmt: Stmt.Class) -> None:
+        enclosing = self.current_class
+        self.current_class = ClassType.CLASS
         self.declare(stmt.name)
         self.define(stmt.name)
         self.scopes[-1][stmt.name.string_repr].is_init = True
+
+        self.begin_scope()
+        self.scopes[-1]["this"] = IdentifierState(
+            is_defined=True, is_init=True, is_mutable=False, is_used=True
+        )
+
         for method in stmt.methods:
             declaration = FunctionType.METHOD
             self.resolve_function(
                 params=method.params, body=method.body, function_type=declaration
             )
+
+        self.end_scope()
+        self.current_class = enclosing
 
     @override
     def visit_get_expr(self, expr: Expr.Get) -> None:
@@ -368,3 +385,12 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
     def visit_set_expr(self, expr: Expr.Set) -> None:
         self.resolve(expr.value)
         self.resolve(expr.obj)
+
+    @override
+    def visit_this_expr(self, expr: Expr.This) -> None:
+        if self.current_class == ClassType.NONE:
+            self.report_error(
+                'Syntax Error: "this" expression outside a class', token=expr.keyword
+            )
+            return
+        self.resolve_local(expr, expr.keyword)
