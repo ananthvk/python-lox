@@ -375,7 +375,11 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         self.environment.declare(stmt.name)
         methods: Dict[str, LoxFunction] = {}
         for method in stmt.methods:
-            function = LoxFunction(closure=self.environment, declaration=method)
+            function = LoxFunction(
+                closure=self.environment,
+                declaration=method,
+                is_initializer=(method.name.string_repr == "init"),
+            )
             methods[method.name.string_repr] = function
 
         classobj = LoxClass(stmt.name.string_repr, methods)

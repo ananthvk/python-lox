@@ -23,11 +23,17 @@ class LoxClass(Callable):
 
     @override
     def arity(self) -> int:
-        return 0
+        constructor = self.methods.get("init")
+        if constructor is None:
+            return 0
+        return constructor.arity()
 
     @override
     def call(self, interpreter: "Interpreter", args: List[object]) -> object:
         instance = LoxInstance(class_=self)
+        constructor = self.methods.get("init")
+        if constructor is not None:
+            constructor.bind(instance).call(interpreter, args)
         return instance
 
 

@@ -31,6 +31,7 @@ class IdentifierState:
 class FunctionType(Enum):
     NONE = auto()
     FUNCTION = auto()
+    INITIALIZER = auto()
     METHOD = auto()
 
 
@@ -333,6 +334,11 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
                 token=stmt.keyword,
             )
         if stmt.value:
+            if self.current_function == FunctionType.INITIALIZER:
+                self.report_error(
+                    "Syntax Error: Cannot return a value inside a constructor",
+                    token=stmt.keyword,
+                )
             self.resolve(stmt.value)
 
     @override
@@ -367,6 +373,8 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
         for method in stmt.methods:
             declaration = FunctionType.METHOD
+            if method.name.string_repr == "init":
+                declaration = FunctionType.INITIALIZER
             self.resolve_function(
                 params=method.params, body=method.body, function_type=declaration
             )

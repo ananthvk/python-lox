@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Final, List, override
 from .ast import expr, stmt
 from .environment import Environment
 from .exceptions import ReturnException
+from .token import Token, TokenType
 
 if TYPE_CHECKING:
     from .interpreter import Interpreter
@@ -25,9 +26,15 @@ class Callable(ABC):
 
 
 class LoxFunction(Callable):
-    def __init__(self, declaration: stmt.Function, closure: Environment) -> None:
+    def __init__(
+        self,
+        declaration: stmt.Function,
+        closure: Environment,
+        is_initializer: bool = False,
+    ) -> None:
         self.declaration: Final[stmt.Function] = declaration
         self.closure: Final[Environment] = closure
+        self.is_initializer = is_initializer
 
     @override
     def name(self) -> str:
@@ -49,13 +56,27 @@ class LoxFunction(Callable):
         try:
             interpreter.execute_multiple_statements(self.declaration.body, environment)
         except ReturnException as e:
+            if self.is_initializer:
+                tok = Token()
+                tok.token_type = TokenType.THIS
+                tok.string_repr = "this"
+                return self.closure.get_at(0, tok)
             return e.value
+        if self.is_initializer:
+            tok = Token()
+            tok.token_type = TokenType.THIS
+            tok.string_repr = "this"
+            return self.closure.get_at(0, tok)
         return None
 
     def bind(self, instance: "LoxInstance") -> "LoxFunction":
         environment = Environment(parent=self.closure)
         environment.define("this", instance)
-        return LoxFunction(declaration=self.declaration, closure=environment)
+        return LoxFunction(
+            declaration=self.declaration,
+            closure=environment,
+            is_initializer=self.is_initializer,
+        )
 
 
 class ArrowFunction(Callable):

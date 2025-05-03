@@ -1,0 +1,32 @@
+class FruitItem {
+    init(name, quantity, x) {
+        this.name = name;
+        this.quantity = quantity;
+        if x % 2 == 0 {
+            return;
+        }
+        this.x = x;
+    }
+    
+    display() {
+        return to_string(this.quantity) + " " + this.name;
+    }
+}
+
+const fruit = FruitItem("Apple", 30, 20);
+
+assert fruit.display() == "30 Apple";
+assert fruit.name == "Apple";
+assert fruit.quantity == 30;
+
+const f =  fruit.init("banana", 20, 30);
+
+assert fruit.display() == "20 banana";
+assert fruit.name == "banana";
+assert fruit.quantity == 20;
+
+f.name = "Kiwi";
+assert f.name == "Kiwi";
+
+const fruit2 = FruitItem("Apple", 30, 5);
+assert fruit2.x == 5;
