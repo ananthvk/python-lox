@@ -46,13 +46,11 @@ class LoxInstance:
         return f"<{self.class_.name()} instance at 0x{id(self):x}>"
 
     def get(self, name: Token) -> object:
-        value = self.fields.get(name.string_repr)
-        if value is not None:
-            return value
+        if name.string_repr in self.fields:
+            return self.fields[name.string_repr]
 
-        value = self.class_.methods.get(name.string_repr)
-        if value is not None:
-            return value.bind(self)
+        if name.string_repr in self.class_.methods:
+            return self.class_.methods[name.string_repr].bind(self)
 
         raise RuntimeException(
             f'Error: There is no attribute "{name.string_repr}" on an instance of class "{self.class_.name()}"',

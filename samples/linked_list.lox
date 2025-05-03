@@ -1,0 +1,40 @@
+class Node {
+    init(value, next) {
+        this.value = value;
+        this.next = next;
+    }
+}
+
+class LinkedList {
+    init() {
+        this.head = nil;
+    }
+
+    append(value) {
+        const new_node = Node(value, nil);
+        if this.head == nil {
+            this.head = new_node;
+        } else {
+            var current = this.head;
+            while current.next != nil {
+                current = current.next;
+            }
+            current.next = new_node;
+        }
+    }
+
+    display() {
+        var current = this.head;
+        while current != nil {
+            print to_string(current.value) + " ";
+            current = current.next;
+        }
+    }
+}
+
+const list = LinkedList();
+list.append(10);
+list.append(20);
+list.append(30);
+list.display();
+println "";
