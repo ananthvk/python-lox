@@ -209,3 +209,30 @@ Y=30
 -Wunused: Unused variable "y" 
     1 | var y = 80;
 ```
+
+18) Static methods - Declared with the `static` keyword inside a class. They can be called directly on the class without creating an instance.
+```
+class Math {
+    static add(a, b) {
+        return a + b;
+    }
+}
+
+println Math.add(5, 10); // 15
+```
+
+19) Getters - Declared as methods without parameters inside a class. They are accessed like properties.
+```
+class Circle {
+    init(r) {
+        this.radius = r;
+    }
+
+    area {
+        return 3.1415 * this.radius * this.radius;
+    }
+}
+
+const c = Circle(10);
+println c.area; // 314.15
+```
