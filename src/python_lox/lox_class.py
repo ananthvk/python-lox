@@ -16,9 +16,14 @@ class LoxInstance:
     def __str__(self) -> str:
         return f"<{self.class_.name()} instance at 0x{id(self):x}>"
 
-    def get(self, name: Token) -> object:
+    def get(self, name: Token, interpreter: "Interpreter") -> object:
         if name.string_repr in self.fields:
             return self.fields[name.string_repr]
+
+        if name.string_repr in self.class_.getters:
+            return (
+                self.class_.getters[name.string_repr].bind(self).call(interpreter, [])
+            )
 
         if name.string_repr in self.class_.methods:
             return self.class_.methods[name.string_repr].bind(self)
@@ -39,11 +44,17 @@ class LoxInstance:
 
 
 class LoxClass(LoxInstance, Callable):
-    def __init__(self, name_: str, methods: Dict[str, LoxFunction]) -> None:
+    def __init__(
+        self,
+        name_: str,
+        methods: Dict[str, LoxFunction],
+        getters: Dict[str, LoxFunction] = {},
+    ) -> None:
         LoxInstance.__init__(self, Meta())
         Callable.__init__(self)
         self.name_ = name_
         self.methods = methods
+        self.getters = getters
 
     def __str__(self) -> str:
         return f"<class {self.name_}>"
@@ -74,6 +85,7 @@ class Meta(LoxClass):
         Callable.__init__(self)
         self.name_ = "Meta"
         self.methods: Dict[str, LoxFunction] = {}
+        self.getters: Dict[str, LoxFunction] = {}
 
     def __str__(self) -> str:
         return f"<meta {self.name_}>"

@@ -1,0 +1,31 @@
+class Circle {
+  init(radius) {
+    this.radius = radius;
+  }
+
+  area {
+    return 3 * this.radius * this.radius;
+  }
+  
+  radius_square {
+    return this.radius * this.radius;
+  }
+}
+
+var circle = Circle(4);
+assert circle.area == 48;
+assert circle.radius_square == 16;
+
+class Person {
+    init(fname, lname) {
+        this.fname = fname;
+        this.lname = lname;
+    }
+    
+    greeting {
+        return "Hello, " + this.fname + " " + this.lname;
+    }
+}
+
+const person = Person("Alice", "Bob");
+assert person.greeting == "Hello, Alice Bob";

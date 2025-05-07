@@ -373,8 +373,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     @override
     def visit_class_stmt(self, stmt: Stmt.Class) -> None:
         self.environment.declare(stmt.name)
+
         methods: Dict[str, LoxFunction] = {}
         static_methods: Dict[str, LoxFunction] = {}
+        getters: Dict[str, LoxFunction] = {}
 
         for method in stmt.methods:
             function = LoxFunction(
@@ -392,7 +394,15 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             )
             static_methods[static_method.name.string_repr] = function
 
-        classobj = LoxClass(stmt.name.string_repr, methods)
+        for getter in stmt.getters:
+            function = LoxFunction(
+                closure=self.environment,
+                declaration=getter,
+                is_initializer=False,
+            )
+            getters[getter.name.string_repr] = function
+
+        classobj = LoxClass(stmt.name.string_repr, methods, getters=getters)
         classobj.class_.methods = static_methods
         self.environment.define(stmt.name, classobj)
 
@@ -404,7 +414,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
                 "Only instances of class have fields", token=expr.name
             )
 
-        return obj.get(expr.name)
+        return obj.get(expr.name, self)
 
     @override
     def visit_set_expr(self, expr: Expr.Set) -> object:

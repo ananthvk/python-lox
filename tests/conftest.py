@@ -5,7 +5,7 @@ from typing import List
 from python_lox.interpreter import Interpreter
 from python_lox.lexer import Lexer
 from python_lox.parser import Parser
-from python_lox.resolver import Resolver
+from python_lox.resolver import IdentifierState, Resolver
 
 
 def interpret(source: str):
@@ -22,7 +22,9 @@ def interpret(source: str):
 
     resolver.scopes.append({})
     for global_value in interpreter.globals.values.keys():
-        resolver.scopes[0][global_value] = True
+        resolver.scopes[0][global_value] = IdentifierState(
+            is_init=True, is_mutable=False, is_defined=True, is_used=True
+        )
     resolver.resolve(expr)
 
     interpreter.interpret(expr)

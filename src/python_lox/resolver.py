@@ -404,6 +404,19 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
                 params=method.params, body=method.body, function_type=declaration
             )
 
+        for getter in stmt.getters:
+            if getter.name.string_repr == "init":
+                self.report_error(
+                    "Syntax Error: init method cannot be a getter",
+                    getter.name,
+                    "error",
+                )
+            self.resolve_function(
+                params=getter.params,
+                body=getter.body,
+                function_type=FunctionType.FUNCTION,
+            )
+
         self.end_scope()
         self.current_class = enclosing
 

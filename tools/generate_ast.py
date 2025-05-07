@@ -72,6 +72,7 @@ ast_classes: Dict[str, Any] = {
             ("name", "Token"),
             ("methods", "List[Function]"),
             ("static_methods", "List[Function]"),
+            ("getters", "List[Function]"),
         ],
     },
 }

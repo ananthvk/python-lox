@@ -53,6 +53,11 @@ class Parser:
             return False
         return self.peek().token_type == token_type
 
+    def check_next(self, token_type: TokenType) -> bool:
+        if (self.current + 1) >= len(self.tokens):
+            return False
+        return self.tokens[self.current + 1].token_type == token_type
+
     def advance(self) -> Token:
         token = self.tokens[self.current]
         if not self.is_at_end():
@@ -643,14 +648,33 @@ class Parser:
 
         methods: List[stmt.Function] = []
         static_methods: List[stmt.Function] = []
+        getters: List[stmt.Function] = []
+
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
             if self.match([TokenType.STATIC]):
                 static_methods.append(self.function("static method"))
+            elif self.check(TokenType.IDENTIFIER) and self.check_next(
+                TokenType.LEFT_BRACE
+            ):
+                self.advance()
+                property_name = self.previous()
+                self.consume(
+                    [TokenType.LEFT_BRACE], 'Expected "{" after getter declaration'
+                )
+                # A getter expression
+                block = self.block_statement()
+                # Desugar the getter expression into a function
+                method = stmt.Function(
+                    name=property_name, params=[], body=block.statements
+                )
+                getters.append(method)
             else:
                 methods.append(self.function("method"))
 
         self.consume([TokenType.RIGHT_BRACE], message='Expected "}" after class body')
-        return stmt.Class(name=name, methods=methods, static_methods=static_methods)
+        return stmt.Class(
+            name=name, methods=methods, static_methods=static_methods, getters=getters
+        )
 
     def declaration(self) -> stmt.Stmt:
         if self.match([TokenType.VAR]):
