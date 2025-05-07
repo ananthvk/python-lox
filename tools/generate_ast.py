@@ -68,7 +68,11 @@ ast_classes: Dict[str, Any] = {
             ("body", "List[Stmt]"),
         ],
         "return": [("keyword", "Token"), ("value", "Expr | None = None")],
-        "class": [("name", "Token"), ("methods", "List[Function]")],
+        "class": [
+            ("name", "Token"),
+            ("methods", "List[Function]"),
+            ("static_methods", "List[Function]"),
+        ],
     },
 }
 

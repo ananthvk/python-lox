@@ -35,6 +35,7 @@ tokendefs = {
         "break": "BREAK",
         "continue": "CONTINUE",
         "assert": "ASSERT",
+        "static": "STATIC",
     },
     "single_char_tokens": {
         "(": "LEFT_PAREN",

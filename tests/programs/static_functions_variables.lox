@@ -1,0 +1,63 @@
+// First version, static variables
+// This works similar to python
+
+class Foo {
+}
+
+Foo.x = 42;
+
+assert Foo.x == 42;
+
+const foo = Foo();
+
+assert foo.x == 42;
+foo.x = 32;
+assert foo.x == 32;
+assert Foo.x == 42;
+
+
+const foo1 = Foo();
+const foo2 = Foo();
+
+assert foo1.x == 42;
+assert foo2.x == 42;
+
+Foo.x = 52;
+
+assert foo1.x == 52;
+assert foo2.x == 52;
+assert foo.x == 32;
+
+
+// Static functions
+class Math {
+    static abs(x) {
+        if x < 0 {
+            return -x;
+        } else {
+            return x;
+        }
+    }
+    
+    static getname() { 
+        return "Name";
+    }
+}
+
+Math.add = (x, y) => x + y;
+Math.subtract = (x, y) => x - y;
+
+assert Math.add(3, 2) == 5;
+assert Math.subtract(3, 8) == -5;
+
+assert Math.abs(-33) == 33;
+assert Math.getname() == "Name";
+
+const m = Math();
+assert m.abs(-52) == 52;
+assert m.add(3, 5) == 8;
+
+m.abs = (x) => x + 10;
+
+assert m.abs(20) == 30;
+assert Math.abs(-53) == 53;

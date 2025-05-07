@@ -1,11 +1,12 @@
-from abc import ABC, abstractmethod
+from typing import Generic, TypeVar, List
 from dataclasses import dataclass
-from typing import Generic, List, TypeVar
-
+from abc import ABC, abstractmethod
 from ..token import Token
-from .expr import Expr
 
-T = TypeVar("T")
+
+from .expr import  Expr
+    
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
@@ -204,6 +205,8 @@ class Return(Stmt):
 class Class(Stmt):
     name: Token
     methods: List[Function]
+    static_methods: List[Function]
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_class_stmt(self)
+

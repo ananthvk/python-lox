@@ -374,6 +374,8 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def visit_class_stmt(self, stmt: Stmt.Class) -> None:
         self.environment.declare(stmt.name)
         methods: Dict[str, LoxFunction] = {}
+        static_methods: Dict[str, LoxFunction] = {}
+
         for method in stmt.methods:
             function = LoxFunction(
                 closure=self.environment,
@@ -382,7 +384,16 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             )
             methods[method.name.string_repr] = function
 
+        for static_method in stmt.static_methods:
+            function = LoxFunction(
+                closure=self.environment,
+                declaration=static_method,
+                is_initializer=False,
+            )
+            static_methods[static_method.name.string_repr] = function
+
         classobj = LoxClass(stmt.name.string_repr, methods)
+        classobj.class_.methods = static_methods
         self.environment.define(stmt.name, classobj)
 
     @override

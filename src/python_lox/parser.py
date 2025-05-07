@@ -642,11 +642,15 @@ class Parser:
         self.consume([TokenType.LEFT_BRACE], message='Expected "{" after class name')
 
         methods: List[stmt.Function] = []
+        static_methods: List[stmt.Function] = []
         while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
-            methods.append(self.function("method"))
+            if self.match([TokenType.STATIC]):
+                static_methods.append(self.function("static method"))
+            else:
+                methods.append(self.function("method"))
 
         self.consume([TokenType.RIGHT_BRACE], message='Expected "}" after class body')
-        return stmt.Class(name=name, methods=methods)
+        return stmt.Class(name=name, methods=methods, static_methods=static_methods)
 
     def declaration(self) -> stmt.Stmt:
         if self.match([TokenType.VAR]):

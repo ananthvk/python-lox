@@ -360,11 +360,36 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
 
     @override
     def visit_class_stmt(self, stmt: Stmt.Class) -> None:
+        # TODO: Fix bug where in the REPL, a function declaration fails, but does not allow redeclaration
+        is_declared = self.scopes[-1].get(stmt.name.string_repr)
+        if is_declared is not None:
+            self.report_error(
+                f"Name Error: class {stmt.name.string_repr} has already been declared in this scope",
+                token=stmt.name,
+            )
+
         enclosing = self.current_class
         self.current_class = ClassType.CLASS
         self.declare(stmt.name)
         self.define(stmt.name)
         self.scopes[-1][stmt.name.string_repr].is_init = True
+        self.scopes[-1][stmt.name.string_repr].is_mutable = False
+
+        # Before adding this, resolve all static methods
+        # TODO: Note: what will happen if the class is defined inside another class? Static methods in the inner class should
+        # not be able to access this of the outer class, but the current implementation does not prevent that. Fix it.
+        for static_method in stmt.static_methods:
+            if static_method.name.string_repr == "init":
+                self.report_error(
+                    "Syntax Error: init method cannot be static",
+                    static_method.name,
+                    "error",
+                )
+            self.resolve_function(
+                params=static_method.params,
+                body=static_method.body,
+                function_type=FunctionType.METHOD,
+            )
 
         self.begin_scope()
         self.scopes[-1]["this"] = IdentifierState(

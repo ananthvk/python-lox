@@ -51,6 +51,7 @@ class TokenType(Enum):
     SLASH_EQUAL = auto()
     STAR = auto()
     STAR_EQUAL = auto()
+    STATIC = auto()
     STRING = auto()
     SUPER = auto()
     THIS = auto()
@@ -85,6 +86,7 @@ keywords = {
     "break": TokenType.BREAK,
     "continue": TokenType.CONTINUE,
     "assert": TokenType.ASSERT,
+    "static": TokenType.STATIC,
 }
 
 single_char_tokens = {

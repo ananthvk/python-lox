@@ -1,13 +1,14 @@
-from abc import ABC, abstractmethod
+from typing import Generic, TypeVar, List
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, List, TypeVar
-
+from abc import ABC, abstractmethod
 from ..token import Token
 
+
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .stmt import Stmt
-
-T = TypeVar("T")
+        
+T = TypeVar('T')
 
 
 class Visitor(ABC, Generic[T]):
@@ -186,3 +187,4 @@ class This(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_this_expr(self)
+
