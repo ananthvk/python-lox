@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Generic, List, TypeVar
 
 from ..token import Token
-from .expr import Expr
+from .expr import Expr, Variable
 
 T = TypeVar("T")
 
@@ -206,6 +206,7 @@ class Class(Stmt):
     methods: List[Function]
     static_methods: List[Function]
     getters: List[Function]
+    base_class: Variable | None = None
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_class_stmt(self)

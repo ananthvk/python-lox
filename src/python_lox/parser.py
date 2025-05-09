@@ -348,6 +348,9 @@ class Parser:
         if self.match([TokenType.THIS]):
             return expr.This(keyword=self.previous())
 
+        if self.match([TokenType.SUPER]):
+            return expr.Super(keyword=self.previous())
+
         if self.match([TokenType.NIL]):
             return expr.Literal(value=None)
 
@@ -396,7 +399,10 @@ class Parser:
             self.factor()
             raise ParserException("Left hand operand missing", token=err_token)
 
-        raise ParserException("Expected expression", token=self.previous())
+        tok = self.peek()
+        if tok.token_type == TokenType.EOF:
+            tok = self.previous()
+        raise ParserException("Expected expression", token=tok)
 
     def arrow_function(self) -> None | expr.Arrow:
         prev_current: int = self.current
@@ -474,7 +480,7 @@ class Parser:
         except ParserException as e:
             if str(e) == "Expected expression":
                 raise ParserException(
-                    "Expected valid expression after if", token=self.previous()
+                    "Expected valid expression after if", token=e.token
                 )
             else:
                 raise e
@@ -498,7 +504,7 @@ class Parser:
         except ParserException as e:
             if str(e) == "Expected expression":
                 raise ParserException(
-                    "Expected valid expression after while", token=self.previous()
+                    "Expected valid expression after while", token=e.token
                 )
             else:
                 raise e
@@ -644,6 +650,14 @@ class Parser:
     def class_declaration(self) -> stmt.Class:
         self.consume([TokenType.IDENTIFIER], message="Expected class name")
         name = self.previous()
+
+        base_class: expr.Variable | None = None
+        if self.match([TokenType.COLON]):
+            self.consume(
+                [TokenType.IDENTIFIER], message='Expected base class name after ":"'
+            )
+            base_class = expr.Variable(name=self.previous())
+
         self.consume([TokenType.LEFT_BRACE], message='Expected "{" after class name')
 
         methods: List[stmt.Function] = []
@@ -673,7 +687,11 @@ class Parser:
 
         self.consume([TokenType.RIGHT_BRACE], message='Expected "}" after class body')
         return stmt.Class(
-            name=name, methods=methods, static_methods=static_methods, getters=getters
+            name=name,
+            methods=methods,
+            static_methods=static_methods,
+            getters=getters,
+            base_class=base_class,
         )
 
     def declaration(self) -> stmt.Stmt:
@@ -692,7 +710,11 @@ class Parser:
         while not self.is_at_end():
             prev_current = self.current
             try:
-                statements.append(self.declaration())
+                # Ignore empty statements
+                while self.check(TokenType.SEMICOLON):
+                    self.advance()
+                if not self.is_at_end():
+                    statements.append(self.declaration())
             except ParserException as e:
                 if not repl:
                     if self.error_reporter is None:

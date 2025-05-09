@@ -1,0 +1,38 @@
+class Animal {
+    init(name) {
+        this.name = name;
+    }
+
+    speak {
+        return this.name + " makes a sound.";
+    }
+}
+
+class Dog : Animal {
+    init(name, breed) {
+        super.init(name);
+        this.breed = breed;
+    }
+
+    speak {
+        return this.name + " barks.";
+    }
+}
+
+class FriendlyDog: Dog {
+    init(name, breed) {
+        super.init(name, breed);
+    }
+    
+    speak {
+        return this.name + ", a friendly " + this.breed + " barks";
+    }
+    
+    static getMood() {
+        return "Friendly";
+    }
+}
+
+const dog = FriendlyDog("Fido", "Golden Retriever");
+println dog.speak;
+println "Currently the dog is " + dog.getMood(); 

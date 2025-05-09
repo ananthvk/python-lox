@@ -72,6 +72,8 @@ class LoxFunction(Callable):
     def bind(self, instance: "LoxInstance") -> "LoxFunction":
         environment = Environment(parent=self.closure)
         environment.define("this", instance)
+        if instance.base_class_instance is not None:
+            environment.define("super", instance.base_class_instance)
         return LoxFunction(
             declaration=self.declaration,
             closure=environment,

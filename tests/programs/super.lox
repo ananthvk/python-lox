@@ -1,0 +1,47 @@
+class Person {
+    init(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    display() {
+        println "Name: " + to_string(this.name);
+        println "Age: " + to_string(this.age);
+    }
+    
+    addToAge(x) {
+        this.age += x;
+    }
+}
+
+class Employee: Person {
+    init(name, age, empid, salary) {
+        super.init(name, age);
+        this.empid = empid;
+        this.salary = salary;
+    }
+    
+    display() {
+        super.display();
+        println "Employee id: " + to_string(this.empid);
+        println "Salary: " + to_string(this.salary);
+    }
+    
+    addToAgeDerived() {
+        this.age += 20;
+    }
+}
+
+const employee = Employee("Bob", 50, 123, 10000);
+employee.display();
+
+assert employee.name == "Bob";
+assert employee.empid == 123;
+assert employee.salary == 10000;
+assert employee.age == 50;
+
+employee.addToAge(5);
+assert employee.age == 55;
+
+employee.addToAgeDerived();
+assert employee.age == 75;

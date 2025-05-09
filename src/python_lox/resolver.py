@@ -38,6 +38,7 @@ class FunctionType(Enum):
 class ClassType(Enum):
     NONE = auto()
     CLASS = auto()
+    SUBCLASS = auto()
 
 
 class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
@@ -375,6 +376,19 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.scopes[-1][stmt.name.string_repr].is_init = True
         self.scopes[-1][stmt.name.string_repr].is_mutable = False
 
+        if (
+            stmt.base_class is not None
+            and stmt.base_class.name.string_repr == stmt.name.string_repr
+        ):
+            self.report_error(
+                f"Syntax Error: class {stmt.name.string_repr} inherits from itself",
+                token=stmt.name,
+            )
+
+        if stmt.base_class is not None:
+            self.current_class = ClassType.SUBCLASS
+            self.resolve(stmt.base_class)
+
         # Before adding this, resolve all static methods
         # TODO: Note: what will happen if the class is defined inside another class? Static methods in the inner class should
         # not be able to access this of the outer class, but the current implementation does not prevent that. Fix it.
@@ -395,6 +409,11 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
         self.scopes[-1]["this"] = IdentifierState(
             is_defined=True, is_init=True, is_mutable=False, is_used=True
         )
+
+        if stmt.base_class is not None:
+            self.scopes[-1]["super"] = IdentifierState(
+                is_defined=True, is_init=True, is_mutable=False, is_used=True
+            )
 
         for method in stmt.methods:
             declaration = FunctionType.METHOD
@@ -440,3 +459,19 @@ class Resolver(Expr.Visitor[None], Stmt.Visitor[None]):
             )
             return
         self.resolve_local(expr, expr.keyword)
+
+    @override
+    def visit_super_expr(self, expr: Expr.Super) -> None:
+        if self.current_class == ClassType.NONE:
+            self.report_error(
+                'Syntax Error: "super" expression outside a class', token=expr.keyword
+            )
+            return
+        elif self.current_class == ClassType.CLASS:
+            self.report_error(
+                'Syntax Error: "super" expression inside class that does not have a base class',
+                token=expr.keyword,
+            )
+            return
+        elif self.current_class == ClassType.SUBCLASS:
+            self.resolve_local(expr, expr.keyword)

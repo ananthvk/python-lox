@@ -36,6 +36,7 @@ ast_classes: Dict[str, Any] = {
         "get": [("obj", "Expr"), ("name", "Token")],
         "set": [("obj", "Expr"), ("name", "Token"), ("value", "Expr")],
         "this": [("keyword", "Token")],
+        "super": [("keyword", "Token")],
     },
     "stmt": {
         "expression": [("expression", "Expr")],
@@ -73,6 +74,7 @@ ast_classes: Dict[str, Any] = {
             ("methods", "List[Function]"),
             ("static_methods", "List[Function]"),
             ("getters", "List[Function]"),
+            ("base_class", "Variable | None = None"),
         ],
     },
 }
@@ -84,7 +86,7 @@ if TYPE_CHECKING:
     from .stmt import Stmt
         """,
     "stmt": """
-from .expr import  Expr
+from .expr import  Expr, Variable
     """,
 }
 

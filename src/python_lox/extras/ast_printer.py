@@ -71,3 +71,7 @@ class ASTPrinter(Expr.Visitor[str]):
     @override
     def visit_this_expr(self, expr: Expr.This) -> str:
         return "(this)"
+
+    @override
+    def visit_super_expr(self, expr: Expr.Super) -> str:
+        return "(super)"

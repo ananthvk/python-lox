@@ -236,3 +236,30 @@ class Circle {
 const c = Circle(10);
 println c.area; // 314.15
 ```
+
+20) Implemented inheritance with a similar style to Python. Derived class must call `super.init` to initialize parent class properties.
+```
+class Animal {
+    init(name) {
+        this.name = name;
+    }
+
+    speak {
+        return this.name + " makes a sound.";
+    }
+}
+
+class Dog : Animal {
+    init(name, breed) {
+        super.init(name);
+        this.breed = breed;
+    }
+
+    speak {
+        return this.name + " barks.";
+    }
+}
+
+const dog = Dog("Fido", "Golden Retriever");
+println dog.speak;
+```

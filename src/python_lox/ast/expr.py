@@ -63,6 +63,10 @@ class Visitor(ABC, Generic[T]):
     def visit_this_expr(self, expr: "This") -> T:
         pass
 
+    @abstractmethod
+    def visit_super_expr(self, expr: "Super") -> T:
+        pass
+
 
 class Expr(ABC):
     @abstractmethod
@@ -186,3 +190,11 @@ class This(Expr):
 
     def accept(self, visitor: Visitor[T]) -> T:
         return visitor.visit_this_expr(self)
+
+
+@dataclass
+class Super(Expr):
+    keyword: Token
+
+    def accept(self, visitor: Visitor[T]) -> T:
+        return visitor.visit_super_expr(self)

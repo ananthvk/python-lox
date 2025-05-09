@@ -4,7 +4,10 @@ declaration          = const_declaration
                       | function_declaration
                       | class_declaration
                       | statement
-class_declaration    = "class" IDENTIFIER "{" function* "}" 
+class_declaration    = "class" IDENTIFIER (":" IDENTIFIER)? "{" method* "}" 
+method               = function
+                      | "static" function
+                      | IDENTIFIER block
 function_declaration = "fun" function
 function             = IDENTIFIER "(" parameters? ")" block
 parameters           = IDENTIFIER ( "," IDENTIFIER ) * 

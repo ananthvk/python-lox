@@ -1,0 +1,29 @@
+class Doughnut {
+  cook() {
+    return "Fry until golden brown.";
+  }
+}
+
+class BostonCream : Doughnut {}
+
+println BostonCream().cook();
+
+class A {
+  method() {
+    return "A method";
+  }
+}
+
+class B : A {
+  method() {
+    return "B method";
+  }
+
+  test() {
+    return super.method();
+  }
+}
+
+class C : B {}
+
+assert C().test() == "A method";

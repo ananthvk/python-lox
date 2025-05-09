@@ -377,6 +377,16 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         methods: Dict[str, LoxFunction] = {}
         static_methods: Dict[str, LoxFunction] = {}
         getters: Dict[str, LoxFunction] = {}
+        base_class: LoxClass | None = None
+
+        if stmt.base_class is not None:
+            cls = self.evaluate(stmt.base_class)
+            if not isinstance(cls, LoxClass):
+                raise RuntimeException(
+                    f'Error: class "{stmt.name.string_repr}" cannot derive from "{stmt.base_class.name.string_repr}" since "{stmt.base_class.name.string_repr}" is not a class',
+                    token=stmt.name,
+                )
+            base_class = cls
 
         for method in stmt.methods:
             function = LoxFunction(
@@ -402,7 +412,9 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
             )
             getters[getter.name.string_repr] = function
 
-        classobj = LoxClass(stmt.name.string_repr, methods, getters=getters)
+        classobj = LoxClass(
+            stmt.name.string_repr, methods, getters=getters, base_class=base_class
+        )
         classobj.class_.methods = static_methods
         self.environment.define(stmt.name, classobj)
 
@@ -429,6 +441,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     @override
     def visit_this_expr(self, expr: Expr.This) -> object:
+        return self.lookup_variable(expr.keyword, expr)
+
+    @override
+    def visit_super_expr(self, expr: Expr.Super) -> object:
         return self.lookup_variable(expr.keyword, expr)
 
     def execute(self, statement: Stmt.Stmt) -> None:
