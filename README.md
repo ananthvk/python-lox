@@ -25,9 +25,15 @@ $ pdm run check
 
 ## Screenshots
 
+Example run of the visualizer
+```sh
+$ python tools/ast_visualizer.py < samples/ifs.lox > out.dot
+```
+
 Visualization of AST for `5 * 6 / 3 - 2 / 5 * (6 + 8)`
 ![Visualization of AST](images/ast_visual.png)
 
+![Visualization of AST for triangle program](images/triangle.png)
 
 ## Additional features / modifications / challenges
 
